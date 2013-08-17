@@ -1,0 +1,74 @@
+/********************************      Basic Structure      ********************************/
+
+html { font-size: 100%; height: 100%; margin-bottom: 1px; /* Always show a scrollbar to avoid jumping when the scrollbar appears  */ }
+/********************************      Elements styling      ********************************/
+
+h1, h2, h3, h4, h5, h6 { font-family: Helvetica, Arial, sans-serif; color: #222; font-weight: bold; }
+h1 { font-family: Calibri, Helvetica, Arial, sans-serif; font-size: 31px; font-weight: bold; color: #fff; position: absolute; top: -1000px;  /* Remove this line and delete the logo (in the HTML) if you don't want an image as a logo */ }
+h2 { font-size: 26px; padding: 0 0 10px 0; }
+h3 { font-size: 17px; padding: 0 0 10px 0; }
+h4 { font-size: 16px; padding: 0 0 5px 0; }
+h5 { font-size: 14px; padding: 0 0 5px 0; }
+h6 { font-size: 12px; padding: 0 0 5px 0; }
+a { color: #57a000; text-decoration: none; }
+a:hover { color: #000; }
+a:active { color: #777; }
+a:focus { outline: 1px; }
+strong { font-weight: bold; color: #333; }
+small { font-size: 0.85em; }
+pre { font-family: monospace; }
+p { padding: 5px 0 10px 0; line-height: 1.6em; }
+hr{padding:5px auto; border:1px solid #ccc; height:1px;}
+/********************************      General Classes      ********************************/
+
+.clear { clear: both; }
+.align-left { float: left; }
+.align-right { float: right; }
+/************ Button ************/
+.button { font-family: Verdana, Arial, sans-serif; display: inline-block; background: #459300 url('../images/bg-button-green.gif') top left repeat-x !important; border: 1px solid #459300 !important; padding: 4px 6px 4px !important; color: #fff !important; font-size: 12px !important; cursor: pointer; }
+.button:hover { text-decoration: underline; }
+.button:active { padding: 4px 6px 4px !important; }
+a.remove-link { color: #bb0000; }
+a.remove-link:hover { color: #000; }
+/********************************      Main Content      ********************************/
+
+/************ Layout ************/
+
+#main-content { margin: 0 30px 0 30px; padding: 30px 0; }
+.column-left { width: 48%; float: left; }
+.column-right { width: 48%; float: right; }
+#page-intro { font-size: 17px; padding: 0 0 20px 0; }
+#footer { border-top: 1px solid #ccc; margin: 40px 0 0 0; padding: 20px 0; font-size: 12px; }
+
+/*************** Content Box ***************/
+
+.content-box { border: 1px solid #ccc; margin: 0 0 20px 0; background: #fff; }
+.content-box-header { background: #e5e5e5 url('../images/bg-content-box.gif') top left repeat-x; margin-top: 1px; height: 40px; }
+.content-box-header h3 { padding: 12px 15px 10px; float: left; }
+ul.content-box-tabs { float: right; padding: 12px 15px 0 0 !important; margin: 0 !important; }
+ul.content-box-tabs li { float: left; margin: 0; padding: 0 !important; background-image: none !important; }
+ul.content-box-tabs li a { color: #333; padding: 8px 10px; display: block; margin: 1px; border-bottom: 0; }
+ul.content-box-tabs li a:hover { color: #57a000; }
+ul.content-box-tabs li a.current { background: #fff; border: 1px solid #ccc; border-bottom: 0; margin: 0; }
+.content-box-content { padding: 20px; font-size: 13px; border-top: 1px solid #ccc; }
+/************ Table ************/
+@media print{
+	.print { display: block; }
+	.noprint { display: none; }
+}
+#main-content table { width: 100%; border-collapse: collapse; }
+#main-content table thead th { font-weight: bold; font-size: 16px; border: 1px solid #ddd; padding: 6px; }
+#main-content table tbody th { font-weight: bold; font-size: 14px; border: 1px solid #ddd; }
+#main-content tbody { border: 1px solid #ddd; }
+#main-content tbody tr { background: #fff; }
+#main-content tbody tr.alt-row { background: #f3f3f3; }
+#main-content table td, #main-content table th { font-size: 12px; padding: 4px; line-height: 1.3em; border: 1px solid #ddd; }
+#main-content tfoot tr { background: #f3f3f3; }
+#main-content tfoot tr td {  font-weight: bold; font-size: 14px }
+#main-content table tfoot td .bulk-actions { padding: 6px; }
+#main-content table tfoot td .bulk-actions select { padding: 6px; border: 1px solid #ccc; }
+#main-content td.input-label { padding: 10px 0; text-align: right; }
+#main-content td.short-label { width: 110px; }
+#main-content .centertable tbody td { text-align: center; }
+#main-content .centertable tbody th { text-align: center; }
+

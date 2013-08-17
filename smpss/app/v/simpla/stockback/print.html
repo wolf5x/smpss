@@ -1,0 +1,49 @@
+{/include file="simpla/common/printheader.html"/}
+<body>
+	<div id="main-content">
+		<table >
+			<thead>
+				<tr> 
+					<th colspan="7" style="text-align:center;">退货单</th>
+					<tr>
+					</thead>
+					<tbody>
+						<th colspan="7">退货单号：{/$index.stockback_sn/}　顾客名称：{/$index.customer_name/}　退货时间：{/$index.stockback_opttime/}</td>
+					</tr>
+					<tr>
+						<th>商品编号</th>
+						<th>商品名称</th>
+						<th>数量（件）</th>
+						<th>装箱数量</th>
+						<th>单价</th>
+						<th>小计</th>
+						<th>商品备注</th>
+					</tr>
+					{/section name=i loop=$detail/}
+					<tr>
+						<td>{/$detail[i].goods_sn/}</td>
+						<td>{/$detail[i].goods_name_tha/}</td>
+						<td>{/$detail[i].goods_pack_num/}</td>
+						<td>{/$detail[i].goods_pack_size/}</td>
+						<td>{/$detail[i].goods_unitprice/}</td>
+						<td>{/$detail[i].goods_totalprice/}</td>
+						<td>{/$detail[i].goods_note/}</td>
+					</tr>
+					{//section/}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="7">总金额：{/$index.stockback_totalprice/}</td>
+					</tr>
+					<tr>
+						<td colspan="7">退货单备注：{/$index.stockback_note/}</td>
+					</tr>
+				</tfoot>
+			</table>
+			<span class="noprint">
+				<center><input id="btn_print" type="button" value="打印" onclick="window.print();"/><input id="btn_close" type="button" value="关闭" onclick="window.close()"/> </center>
+			</span>
+		</table>
+	</div>
+</body>
+{/include file="simpla/common/footer.html"/}

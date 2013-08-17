@@ -1,0 +1,77 @@
+{/include file="simpla/common/header.html"/}
+{/include file="simpla/common/left.html"/}
+<div id="main-content">
+	<h2>欢迎您 {/$_adminname/}</h2>
+	<p id="page-intro">商品入库。带<font class="red"> * </font>为必填</p>
+	<div class="clear"></div>
+	<div class="content-box">
+		<div class="content-box-header">
+			<h3>新增入库</h3>
+			<ul class="content-box-tabs">
+				<li><a href="{/get_url rule='/stockin/index'/}">入库单管理</a></li>
+				<li><a href="#tab1" class="default-tab">新增入库</a></li>
+			</ul>
+			<div class="clear"></div>
+		</div>
+		<div class="content-box-content">
+			<div class="tab-content default-tab" id="tab1">
+				<div class="form">
+					<form action="{/get_url rule='/stockin/stockin'/}" method="post" id="js-form">
+						<fieldset class="clearfix">
+							<input type="hidden" name="goods_id" value="{/$goods.goods_id/}" />
+							<input type="hidden" name="stockin_sn" value="{/$goods.stockin_sn/}" />
+							<input type="hidden" name="ac" value="{/$ac/}" />
+							<table>
+								<tr>
+									<td class="input-label short-label"><font class="red">* </font>商品编码：</td>
+									<td>
+										<input type="text" value="{/$goods.goods_sn/}" class="text-input" size="24" name="goods_sn" id="goods_sn" readonly/>
+									</td>
+								</tr>
+								<tr>
+									<td class="input-label"><font class="red">* </font>商品名称(中)：</td>
+									<td>
+										<input type="text" value="{/$goods.goods_name_chn/}" class="text-input" size="48" name="goods_name_chn" id="goods_name_chn" readonly/>
+									</td>
+								</tr>
+								<tr>
+									<td class="input-label"><font class="red"></font>商品名称(泰)：</td>
+									<td>
+										<input type="text" value="{/$goods.goods_name_tha/}" class="text-input" size="48" name="goods_name_tha" id="goods_name_tha" readonly/>
+									</td>
+								</tr>
+								<tr>
+									<td class="input-label"><font class="red">* </font>数量(件)：</td>
+									<td>
+										<input type="text" value="{/$goods.goods_pack_num/}" class="text-input" size="24" name="goods_pack_num" id="goods_pack_num" />
+									</td>
+								</tr>
+								<tr>
+									<td class="input-label"><font class="red"></font>装箱数量：</td>
+									<td>
+										<input type="text" value="{/$goods.goods_pack_size/}" class="text-input" size="24" name="goods_pack_size" id="goods_pack_size" readonly/>
+									</td>
+								</tr>
+								<!--p><label class="inline"><font class="red"></font>入库时间:</label>
+								<span><input type="text" value="{/$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'/}" class="text-input small-input" name="stockin_opttime" id="stockin_opttime" readonly/></span> 
+								</p-->
+								<tr>
+									<td class="input-label">备注：</td>
+									<td>
+										<textarea value="{/$goods.stockin_note/}" class="text-input textarea" name="stockin_note" id="stockin_note">{/$goods.stockin_note/}</textarea>
+									</td>
+								</tr>
+								<tr>	
+									<td colspan="2">
+										<center><input type="submit" name="" class="button" id="button" value="确认入库" /></center>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	{/include file="simpla/common/copy.html"/} </div>
+{/include file="simpla/common/footer.html"/}

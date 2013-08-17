@@ -1,0 +1,54 @@
+{/include file="simpla/common/header.html"/}
+{/include file="simpla/common/left.html"/}
+<div id="main-content">
+    <h2>欢迎您 {/$_adminname/}</h2>
+    <p id="page-intro">查看和管理所有已有的商品。</p>
+    <div class="clear"></div>
+    <div class="content-box">
+      <div class="content-box-header">
+        <h3>客户管理</h3>
+        <ul class="content-box-tabs">
+            <li><a href="#tab1" class="default-tab">客户管理</a></li>
+            <li><a href="{/get_url rule="/customer/addcustomer"/}">添加客户</a></li>
+        </ul>
+        <div class="clear"></div>
+      </div>
+      <div class="content-box-content">
+        <div class="tab-content default-tab" id="tab1">
+        <div class="form">
+          <form action="{/get_url rule='/customer/index'/}" method="post" id="js-form" enctype="multipart/form-data">
+            <fieldset>
+                  <p>&nbsp;关键字：<input type="text" value="{/$key/}" class="text-input small-input" name="key" />
+                    <span>（客户名称）<input type="submit" name="" id="button" class="button" value="查询" /></span></p>
+            </fieldset>
+          </form>
+        </div>
+        <hr />
+          <table>
+            <thead>
+              <tr>
+                <th>客户名称</th>
+                
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <td colspan="6">{/$pagebar/}</td>
+              </tr>
+            </tfoot>
+            <tbody>
+                {/section name=i loop=$customer/}
+                <tr>
+                  <td>{/$customer[i].customer_name/}</td>
+                  
+                  <td><a href="{/get_url rule='/customer/addcustomer' data='cid='|cat:$customer[i].customer_id/}" title="编辑"><img src="{/$root_dir/}/assets/simpla/images/icons/pencil.png" alt="编辑" /></a>&nbsp;<a onclick="return(confirm('你确认要删除该客户?'))" href="{/get_url rule='/customer/index' data='ac=del&cid='|cat:$customer[i].customer_id/}" title="删除"><img src="{/$root_dir/}/assets/simpla/images/icons/cross.png" alt="删除" /></a></td>
+                </tr>
+                {//section/}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {/include file="simpla/common/copy.html"/}
+  </div>
+{/include file="simpla/common/footer.html"/}

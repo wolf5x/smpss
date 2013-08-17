@@ -1,0 +1,56 @@
+{/include file="simpla/common/header.html"/}
+{/include file="simpla/common/left.html"/}
+<div id="main-content">
+	<h2>欢迎您 {/$_adminname/}</h2>
+	<p id="page-intro"></p>
+	<div class="clear">导入入库单excel表格。</div>
+	<div class="content-box">
+		<div class="content-box-header">
+			<h3>导入入库单</h3>
+			<ul class="content-box-tabs">
+				<li><a href="#tab1" class="default-tab">入库单管理</a></li>
+				<li><a href="{/get_url rule='/stockin/stockin'/}">新增入库</a></li>
+			</ul>
+			<div class="clear"></div>
+		</div>
+		<div class="content-box-content">
+			<div class="tab-content default-tab" id="tab1">
+				<div class="form">
+					<form action="{/get_url rule='/stockin/index'/}" method="post" id="js-form" enctype="multipart/form-data">
+						<fieldset class="clearfix">
+							<input type="hidden" name="ac" value="{/$ac/}" />
+							<table>
+								<tr>
+									<td class="input-label short-label"><font class="red">* </font>选择文件：</td>
+									<td>
+										<input type="file" name="import_file" value="" id="import_file" onchange="checkFile();"/>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<input type="submit" name="" id="button" class="button" value="导入" />
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	{/include file="simpla/common/copy.html"/} 
+</div>
+{/include file="simpla/common/footer.html"/}
+
+<script type="text/javascript" language="javascript">
+	function checkFile() {
+		var picPath = document.getElementById("import_file").value;
+		var type = picPath.substring(picPath.lastIndexOf(".") + 1, picPath.length).toLowerCase();
+		if (type != "xls") {
+			alert("请上传正确的xls格式文件");
+			$("#import_file").val('');
+			return false;
+		}
+		return true;
+	}
+</script>

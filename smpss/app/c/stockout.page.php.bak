@@ -1,0 +1,364 @@
+<?php
+/**
+ * 销售管理
+ * @author 齐迹  email:smpss2012@gmail.com
+ *
+ */
+class c_stockout extends base_c {
+	function __construct($inPath) {
+		parent::__construct ();
+		if (self::isLogin () === false) {
+			$this->ShowMsg ( "请先登录！", $this->createUrl ( "/main/index" ) );
+		}
+		if (self::checkRights ( $inPath ) === false) {
+			//$this->ShowMsg("您无权操作！",$this->createUrl("/system/index"));
+		}
+		$this->params ['inpath'] = $inPath;
+		$this->params ['head_title'] = "出库管理-" . $this->params ['head_title'];
+	}
+	
+	function pageindex($inPath) {
+		//$str = "%abcde|你好%%defg% \nhaha %hi_jk|我不\n h_ao %";
+
+		$url = $this->getUrlParams ( $inPath );
+		$goods_id = !empty($url ['gid']) ? $url ['gid'] : $_POST ['goods_id'];
+		$stockout_sn = !empty($url ['sid']) ? $url['sid'] : $_POST['stockout_sn'];
+		$ac = !empty($url['ac']) ? $url['ac'] : (!empty($_POST['ac']) ? $_POST['ac'] : '');
+		$ac = trim($ac);
+		$ac = !empty($ac) ? $ac : 'list';
+		$this->params['ac'] = $ac;
+
+		switch ($ac) {
+		case 'detail':
+			if(empty($stockout_sn)) {
+				$this->ShowMsg('出库单编号不能为空！');
+			}
+			$idxObj = base_mAPI::get('m_stockoutindex', $stockout_sn);
+			$idxRs = $idxObj->get();
+			if(!$idxRs) {
+				$this->ShowMsg('错误：' . $idxObj->getError());
+			}
+			$idxRs['stockout_totalprice'] = number_format($idxRs['stockout_totalprice'], 2, '.', '');
+			$detObj = base_mAPI::get('m_stockoutdetail');
+			$detRs = $detObj->getBySn($stockout_sn);
+			if(!$detRs){
+				$this->ShowMsg('错误：' . $detObj->getError());
+			}
+			$this->params['index'] = $idxRs;
+			$this->params['detail'] = $detRs;
+
+			return $this->render ( 'stockout/detail.html', $this->params );
+			break;
+		case 'del':
+			if(empty($stockout_sn)) {
+				$this->ShowMsg('出库单编号不能为空！');
+			}
+			$idxObj = base_mAPI::get('m_stockoutindex', $stockout_sn);
+			$res = $idxObj->deleteOne($stockout_sn);
+			if(!$res) {
+				$this->ShowMsg('删除错误：' . $idxObj->getError());
+			}
+			unset($this->params['ac']);
+
+		case'list':
+		default:
+			$page = !empty($url ['page']) ? ( int ) $url ['page'] : 1;
+			$soutIdx = new m_stockoutindex ();
+			if ($_POST) {
+				$subFilter = isset($_POST['filter']);
+				$subExport = isset($_POST['export']);
+				if($subFilter && $subExport){
+					$this->ShowMsg("呵呵");
+				}
+
+				$key['customer_name'] = base_Utils::getStr ( $_POST ['key_cname'] );
+				$key['stockout_sn'] = base_Utils::getStr ( $_POST ['key_ssn'] );
+				$key['goods_sn'] = base_Utils::getStr ( $_POST ['key_gsn'] );
+				$key['goods_name'] = base_Utils::getStr ( $_POST ['key_name'] );
+				$key['date_start'] = base_Utils::getStr($_POST['date_start']);
+				$key['date_end'] = base_Utils::getStr($_POST['date_end']);
+			}
+
+			if($subExport) {
+				$soutDet = base_mAPI::get('m_stockoutdetail');
+				if(!$soutDet->exportByCondition($key)) {
+					$this->ShowMsg('导出失败:'. $soutDet->getError());
+				}
+				return;
+			}
+
+			$this->params ['key'] = $key;
+
+			$soutIdx->setCount ( true );
+			$soutIdx->setPage ( $page );
+			$soutIdx->setLimit ( base_Constant::PAGE_SIZE );
+			$stockout = $soutIdx->getByCondition($key);
+
+			$this->params['stockout'] = $stockout->items;
+			$this->params ['pagebar'] = $this->PageBar ( $stockout->totalSize, base_Constant::PAGE_SIZE, $page, $inPath );
+			return $this->render ( 'stockout/index.html', $this->params );
+		}
+	}
+	
+	function pagestockout($inPath) {
+		$url = $this->getUrlParams ( $inPath );
+		$goods_id = !empty($url ['gid']) ? $url ['gid'] : $_POST ['goods_id'];
+		$stockout_sn = !empty($url ['sid']) ? $url['sid'] : $_POST['stockout_sn'];
+		$ac = !empty($url['ac']) ? $url['ac'] : (!empty($_POST['ac']) ? $_POST['ac'] : '');
+		$ac = trim($ac);
+		$ac = !empty($ac) ? $ac : 'add';
+		$this->params['ac'] = $ac;
+
+		session_start ();
+		$order_id = $_SESSION ['order_id'];
+		if (! $order_id) {
+			$order_id = date ( "mdHis", time () ) . base_Utils::random ( 4, 1 );
+			$_SESSION ['order_id'] = $order_id;
+		}
+		$infos = &$_SESSION['info'];
+
+		switch($ac) {
+		case('add'):
+			if($goods_id) {
+				$goodsObj = base_mAPI::get ('m_goods', $goods_id);
+				$grs = $goodsObj->get();
+				$this->params['goods'] = $grs;
+				if( !$grs ) {
+					$this->ShowMsg("商品信息错误：" . $goodsObj->getError());
+				}
+				$this->params['ac'] = 'addyes';
+				break;
+			}
+			$this->params['ac'] = 'addch';
+		case('addch'):
+			if($ac == 'addch'){
+				$goodsObj = base_mAPI::get ('m_goods');
+				$grs = $goodsObj->getTheGoods($_POST['goods_sn'], $_POST['goods_name_chn'], $_POST['goods_name_tha']);
+				$this->params['goods'] = $grs;
+				if( !$grs){
+					$this->ShowMsg("商品信息错误：" . $goodsObj->getError());
+				}	
+				$this->params['ac'] = 'addyes';
+			}
+			$this->params['info'] = $infos;
+			break;
+		case('addyes'):
+			$goodsObj = base_mAPI::get ( "m_goods", $goods_id );
+			$grs = $goodsObj->get();
+			$this->params ['goods'] = $grs;
+			if( !$grs ){
+				$this->ShowMsg("商品信息错误: ". $goodsObj->getError() );
+			}
+			if ($ac == 'addyes') {
+				$d['goods_id'] = $goods_id;
+				$d['goods_sn'] = $_POST ['goods_sn'];
+				$d['goods_name_tha'] = $_POST ['goods_name_tha'];
+				$d['goods_name_chn'] = $_POST ['goods_name_chn'];
+				$d['goods_pack_num'] = $_POST['goods_pack_num'];
+				$d['goods_pack_size'] = $_POST ['goods_pack_size'];
+				$d['goods_unitprice'] = $_POST ['goods_unitprice'];
+				$d['goods_totalprice'] = $_POST ['goods_totalprice'];
+				$d['goods_note'] = $_POST['goods_note'];
+
+				$d['goods_unitprice'] = number_format($d['goods_unitprice'], 2, '.', '');
+				$d['goods_totalprice'] = number_format($d['goods_totalprice'], 2, '.', '');
+
+				if($d['goods_sn'] != $grs['goods_sn']
+					|| $d['goods_name_chn'] != $grs['goods_name_chn']
+					|| $d['goods_name_tha'] != $grs['goods_name_tha']
+					|| $d['goods_pack_size'] != $grs['goods_pack_size'])
+				{
+					$this->ShowMsg('商品信息非法！');
+				}
+
+				if($d['goods_pack_num'] <= 0 
+					|| intval($d['goods_pack_num']) != $d['goods_pack_num'])
+				{
+					$this->ShowMsg('商品数量必须为大于0的整数！');
+				}
+
+				if(empty($d['goods_unitprice'])){
+					$this->ShowMsg('未设置商品单价！');
+				} else if($d['goods_unitprice'] < 0) {
+					$this->ShowMsg('商品单价不能小于0！');
+				}
+
+				$tt = round((float)$d['goods_pack_num'] * $d['goods_pack_size'] * $d['goods_unitprice'], 2);
+
+				if($tt != $d['goods_totalprice'])
+				{
+					$this->ShowMsg('商品总价非法！');
+				}
+
+				$ishas = false;
+				$stockout_totalprice = $d['goods_totalprice'];
+				foreach($infos['detail'] as &$g){
+					$stockout_totalprice += $g['goods_totalprice'];
+					if($d['goods_id'] == $g['goods_id']) {
+						if($d['goods_pack_size'] != $g['goods_pack_size']
+							|| $d['goods_unitprice'] != $g['goods_unitprice'])
+					   	{
+							$this->ShowMsg("商品信息有误：订单中已有该商品，但单价不同");
+						}
+						$g['goods_pack_num'] += $d['goods_pack_num'];
+						$g['goods_totalprice'] += $d['goods_totalprice'];
+						$g['goods_note'] .= $d['goods_note'];
+						$ishas = true;
+					}
+					// format the price to 2 decimals
+					$g['goods_unitprice'] = number_format($g['goods_unitprice'], 2, '.', '');
+					$g['goods_totalprice'] = number_format($g['goods_totalprice'], 2, '.', '');
+				}
+				$stockout_totalprice = number_format($stockout_totalprice, 2, '.', '');
+				$infos['index']['stockout_totalprice'] = $stockout_totalprice;
+				if( !$ishas ){
+					$infos['detail'][] = $d;
+				}
+				unset($this->params['goods']);
+				$this->params['ac'] = 'addch';
+			}
+			$this->params['info'] = $infos;
+			break;
+		case 'delone':
+			if($goods_id) {
+				for($i=0,$l=count($infos['detail']); $i<$l; $i++){
+					if($goods_id == $infos['detail'][$i]['goods_id']){
+						$total_price = &$infos['index']['stockout_totalprice'];
+						$total_price -= $infos['detail'][$i]['goods_totalprice'];
+						$total_price = number_format($total_price, 2, '.', '');
+						array_splice($infos['detail'], $i, 1);//TODO 数组删除
+						break;
+					}
+				}
+			}
+			$this->params['ac'] = 'addch';
+			$this->params['info'] = $infos;
+			break;
+		case 'clear':
+			unset($infos['detail']);
+			break;
+		case 'out':
+			if($_POST){
+				$infos['index']['customer_name'] = $_POST['customer_name'];
+				$infos['index']['stockout_note'] = $_POST['stockout_note'];
+				$idxObj = new m_stockoutindex();
+				$res = $idxObj->create($infos['index'], $infos['detail']);
+				if($res){
+					unset($infos['index']);
+					unset($infos['detail']);
+					$this->ShowMsg("出库成功！", $this->createUrl("/stockout/index"), 2, 1);
+				}
+				$this->ShowMsg("出库失败：" . $idxObj->getError());
+			}
+			
+			$this->params['info'] = $infos;
+			break;
+		case 'print':
+			$idxObj = base_mAPI::get('m_stockoutindex', $stockout_sn);
+			$idxRs = $idxObj->get();
+			if(!$idxRs) {
+				$this->ShowMsg('打印失败：' . $idxObj->getError());
+			}
+			$detObj = base_mAPI::get('m_stockoutdetail');
+			$detRs = $detObj->getBySn($stockout_sn);
+			if($detRs === false) {
+				$this->ShowMsg('打印失败：' . $detObj->getError());
+			}
+			$this->params['index'] = $idxRs;
+			$this->params['detail'] = $detRs;
+			$this->params['print_type'] = '出库单';
+			$this->params['print_sn'] = $stockout_sn;
+			break;
+		default:
+			break;
+		}
+		switch($this->params['ac']){
+		case 'print':
+			return $this->render('stockout/print.html', $this->params);
+		case 'addyes':
+			return $this->render ( 'stockout/addone.html', $this->params );
+		case 'add':
+		case 'addch':
+		case 'clear':
+		case 'delone':
+		default:
+			return $this->render ( 'stockout/add.html', $this->params );
+		}
+	}
+
+	function pagestockback($inPath) {
+		$url = $this->getUrlParams ( $inPath );
+		$goods_id = !empty($url ['gid']) ? $url ['gid'] : $_POST ['goods_id'];
+		$stockout_id = isset($url['sid']) ? $url['sid'] : (isset($_POST['sid']) ? $_POST['sid'] : '');
+		$ac = !empty($url['ac']) ? $url['ac'] : (!empty($_POST['ac']) ? $_POST['ac'] : '');
+		$this->params['ac'] = $ac;
+		switch ($ac) {
+		case "back":
+			if( $goods_id ){
+				$goodsObj = base_mAPI::get("m_goods", $goods_id);
+				$goodsRs = $goodsObj->get();
+				if(!$goodsRs){
+					$this->ShowMsg("商品信息错误: ". $goodsObj->getError());
+				}
+				$this->params['goods'] = $goodsRs;
+				$this->params['ac'] = 'backyes';
+				break;
+			}
+			$this->params['ac'] = 'backch';
+		case "backch":
+			if($ac == "backch"){
+				$goodsObj = base_mAPI::get("m_goods");
+				$goodsRs = $goodsObj->getTheGoods($_POST['goods_sn'], $_POST['goods_name_chn'], $_POST['goods_name_tha']);
+				if( !$goodsRs ){
+					$this->ShowMsg("商品信息错误: " . $goodsObj->getError());
+				}
+				$this->params['goods'] = $goodsRs;
+				$this->params['ac'] = 'backyes';
+			}
+			break;
+		case "backyes" :
+			$backObj = base_mAPI::get ('m_stockback');
+			$goodsObj = base_mAPI::get ( "m_goods", $goods_id );
+			$grs = $goodsObj->get();
+			if( !$grs ){
+				$this->ShowMsg("商品信息错误: ". $goodsObj->getError() );
+			}
+			if ($ac == 'backyes' && $_POST) {
+				$data ['goods_id'] = $goods_id;
+				$data ['goods_sn'] = $_POST ['goods_sn'];
+				$data ['goods_name_tha'] = $_POST ['goods_name_tha'];
+				$data ['goods_name_chn'] = $_POST ['goods_name_chn'];
+				$data ['goods_pack_num'] = $_POST ['goods_pack_num'];
+				$op =  "退货";
+				if ($backObj->create ( $data )) {
+					$this->ShowMsg ($op."成功！", $this->createUrl ( "/stockout/stockout" ), 2, 1 );
+				}
+				$this->ShowMsg ( $op."出错！原因：" . $backObj->getError () );
+			}
+			$this->params ['goods'] = $grs;
+			break;
+		default:
+			$backObj = base_mAPI::get('m_stockback');
+			$backObj->setCount ( true );
+			$backObj->setPage ( $page );
+			$backObj->setLimit ( base_Constant::PAGE_SIZE );
+			$condition = "isdel=0";
+			$backs = $backObj->select ($condition , '', '', 'order by stockback_opttime desc');
+
+			$this->params['goods'] = $backs->items;
+			$this->params ['pagebar'] = $this->PageBar ( $backs->totalSize, base_Constant::PAGE_SIZE, $page, $inPath );
+			break;
+		}
+
+		switch($this->params['ac']) {
+		case 'backyes':
+			return $this->render('stockout/back.html', $this->params);
+		case 'back':
+		case 'backch':
+			return $this->render('stockout/backchoose.html', $this->params);
+		default:
+			return $this->render('stockout/backlist.html', $this->params);
+		}
+	}
+
+}

@@ -1,0 +1,81 @@
+{/include file="simpla/common/header.html"/}
+{/include file="simpla/common/left.html"/}
+<div id="main-content">
+    <h2>欢迎您 {/$_adminname/}</h2>
+    <p id="page-intro">查看和管理所有已有的商品。</p>
+    <div class="clear"></div>
+    <div class="content-box">
+      <div class="content-box-header">
+        <h3>商品管理</h3>
+        <ul class="content-box-tabs">
+            <li><a href="#tab1" class="default-tab">商品管理</a></li>
+            <li><a href="{/get_url rule="/goods/addgoods"/}">添加商品</a></li>
+        </ul>
+        <div class="clear"></div>
+      </div>
+      <div class="content-box-content">
+        <div class="tab-content default-tab" id="tab1">
+        <div class="form">
+          <form action="{/get_url rule='/goods/index'/}" method="post" id="js-form" enctype="multipart/form-data">
+            <fieldset class="clearfix">
+				
+                  <p>商品条形码：<span><input type="text" value="{/$key.sn/}" class="text-input small-input" name="key_sn" />
+				     &nbsp;商品中文名称：<input type="text" value="{/$key.chn/}" class="text-input small-input" name="key_chn" />
+				    &nbsp; 商品泰文名称：<input type="text" value="{/$key.tha/}" class="text-input small-input" name="key_tha" />
+								  &nbsp; <input type="submit" name="" id="button" class="button" value="查询" /></span></p>
+            </fieldset>
+          </form>
+        </div>
+        <hr />
+          <table>
+            <thead>
+              <tr>
+                <th>商品条形码</th>
+                <th>商品中文名称</th>
+				<th>商品泰文名称</th>
+                <!--<th>所属分类</th>-->
+                <!--<th>售价(元)</th>-->
+                <!--<th>促销价(元)</th>-->
+                <!--<th>市场价(元)</th>-->
+                <th>库存(件)</th>
+				<th>装箱数量</th>
+				<th>图片</th>
+				<th>简介</th>
+                <!--<th>库存总额(元)</th>
+                <th>销售总额(元)</th>-->
+                <th>管理</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <td colspan="6">{/$pagebar/}</td>
+              </tr>
+            </tfoot>
+            <tbody>
+                {/section name=i loop=$goods/}
+                <tr>
+                  <td>{/$goods[i].goods_sn/}</td>
+                  <td>{/$goods[i].goods_name_chn/}</td>
+				  <td><a href="http://www.baidu.com">{/$goods[i].goods_name_tha/}</a></td>
+                  <!--<td>{/$goods[i].cat_name/}</td>-->
+                  <!--<td><span class="red fb">{/$goods[i].out_price/}</span></td>-->
+                  <!--<td>{/if $goods[i].ispromote eq 1/}{/$goods[i].promote_price/}{/else/}未促销{//if/}</td>-->
+                  <!--<td>{/$goods[i].market_price/}</td>-->
+                  <!--<td>{/if $goods[i].stock gt $goods[i].warn_stock/}{/$goods[i].stock/}{/else/}<span class="red fb" title="低于最小库存">{/$goods[i].stock/}(缺)</span>{//if/}</td>-->
+				  <td>{/$goods[i].goods_stock/}</td>
+				  <td>{/$goods[i].goods_pack_size/}</td>
+				  <td><a href="{/$goods[i].goods_pic.imageurl/}"><img src="{/$goods[i].goods_pic.thumburl/}"></a></td>
+				  <td width=25%>{/$goods[i].goods_note/}</td>
+                  <!--<td><span class="red">{/$goods[i].countamount/}</span></td>
+                  <td><span class="red">{/$goods[i].salesamount/}</span></td>-->
+                  <td><a href="{/get_url rule='/goods/editgoods' data='gid='|cat:$goods[i].goods_id/}" title="编辑"><img src="{/$root_dir/}/assets/simpla/images/icons/pencil.png" alt="编辑" /></a>&nbsp;<a href="{/get_url rule='/purchase/purchase' data='gid='|cat:$goods[i].goods_id/}" title="入库"><img src="{/$root_dir/}/assets/simpla/images/icons/hammer_screwdriver.png" alt="入库" /></a>&nbsp;<a onclick="return(confirm('只有入库错误的时候才使用，你确认入库错误?'))" href="{/get_url rule='/goods/index' data='ac=del&gid='|cat:$goods[i].goods_id/}" title="删除"><img src="{/$root_dir/}/assets/simpla/images/icons/cross.png" alt="删除" /></a></td>
+                </tr>
+                {//section/}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {/include file="simpla/common/copy.html"/}
+  </div>
+{/include file="simpla/common/footer.html"/}

@@ -1,0 +1,49 @@
+﻿{/include file="simpla/common/printheader.html"/}
+<body>
+	<div id="main-content">
+		<table >
+			<thead>
+				<tr> 
+					<th colspan="7" style="text-align:center;">出库单</th>
+					<tr>
+					</thead>
+					<tbody>
+						<th colspan="7">出库单号：{/$index.stockout_sn/}　顾客名称：{/$index.customer_name/}　订单时间：{/$index.stockout_opttime/}</td>
+					</tr>
+					<tr>
+						<th>商品编号รหัสสินค้า</th>
+						<th>商品名称รายการ</th>
+						<th>数量（件）จำนวน</th>
+						<th>装箱数量จำนวนต่อลัง</th>
+						<th>单价ราคา</th>
+						<th>小计จำนวนเงิน</th>
+						<th>商品备注</th>
+					</tr>
+					{/section name=i loop=$detail/}
+					<tr>
+						<td>{/$detail[i].goods_sn/}</td>
+						<td>{/$detail[i].goods_name_tha/}</td>
+						<td>{/$detail[i].goods_pack_num/}</td>
+						<td>{/$detail[i].goods_pack_size/}</td>
+						<td>{/$detail[i].goods_unitprice/}</td>
+						<td>{/$detail[i].goods_totalprice/}</td>
+						<td>{/$detail[i].goods_note/}</td>
+					</tr>
+					{//section/}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="7">总金额รวมเงิน：{/$index.stockout_totalprice/}</td>
+					</tr>
+					<tr>
+						<td colspan="7">ผู้รับสินค้า：{/$index.stockout_note/}</td>
+					</tr>
+				</tfoot>
+			</table>
+			<span class="noprint">
+				<center><input id="btn_print" type="button" value="打印" onclick="window.print();"/><input id="btn_close" type="button" value="关闭" onclick="window.close()"/> </center>
+			</span>
+		</table>
+	</div>
+</body>
+{/include file="simpla/common/footer.html"/}
