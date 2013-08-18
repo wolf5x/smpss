@@ -1,6 +1,6 @@
 <?php
 class base_Constant {
-	const PAGE_SIZE = 5;
+	const PAGE_SIZE = 20;
 	const ROOT_DIR = "/smpss"; 
 	const TABLE_PREFIX = "smpss_";
 	const URL_SUFFIX = "html";
