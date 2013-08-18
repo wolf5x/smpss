@@ -6,7 +6,7 @@
 require_once("global.php");
 SlightPHP::setDebug(true);
 SlightPHP::setAppDir(ROOT_APP);
-SlightPHP::setSplitFlag("-_.");
+SlightPHP::setSplitFlag("/");
 SDb::setConfigFile(ROOT_CONFIG. "/db.ini.php");
 if(($r=SlightPHP::run())===false){
 	header('HTTP/1.1 404 Not Found');

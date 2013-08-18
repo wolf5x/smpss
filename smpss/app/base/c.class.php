@@ -84,12 +84,25 @@ class base_c extends SGui {
 			if ($i % 2) {
                 $key = urldecode($inPath[$i]);
                 $value = urldecode($inPath[$i+1]);
-				$newary [$key] = $value;
+                if ($key != '') {
+                    $newary [$key] = $value;
+                }
 			}
 		}
 		unset ( $newary [base_Constant::URL_SUFFIX] );
 		return $newary;
 	}
+
+    /**
+     * 由参数dict还原inPath数组
+     */
+    public function mergeParamsToInPath($inPath, $params = array()) {
+        $newary = array_slice($inPath, 0, 3);
+        foreach($params as $key => $value) {
+            array_push($newary, $key, $value);
+        }
+        return $newary;
+    }
 	
 	/**
 	 * 构建完整url
@@ -104,7 +117,6 @@ class base_c extends SGui {
             $url = rtrim($url . $uf . $purl, $uf);
 			//$url = rtrim ( $url . base_Constant::URL_FORMAT . $tmp, base_Constant::URL_FORMAT );
 		}
-        $url .= $uf;
 		if (! base_Constant::REWRITE) {
 			return $root_dir."/index.php/c" . $url;
 		} else {
@@ -112,6 +124,9 @@ class base_c extends SGui {
         }
 	}
 
+    /** 
+     * 构建参数列表url
+     */
     public function createParamsUrl($params = array()) {
         $uf = base_Constant::URL_FORMAT;
         $purl = '';

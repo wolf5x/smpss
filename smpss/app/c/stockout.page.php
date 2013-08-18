@@ -21,11 +21,11 @@ class c_stockout extends base_c {
 		//$str = "%abcde|你好%%defg% \nhaha %hi_jk|我不\n h_ao %";
 
 		$url = $this->getUrlParams ( $inPath );
-		$goods_id = !empty($url ['gid']) ? $url ['gid'] : $_POST ['goods_id'];
-		$stockout_sn = !empty($url ['sid']) ? $url['sid'] : $_POST['stockout_sn'];
-		$ac = !empty($url['ac']) ? $url['ac'] : (!empty($_POST['ac']) ? $_POST['ac'] : '');
+		$goods_id = $url ['gid'] ?: $_POST ['goods_id'];
+		$stockout_sn = $url['sid'] ?: $_POST['stockout_sn'];
+		$ac = $url['ac'] ?: $_POST['ac'] ?: '';
 		$ac = trim($ac);
-		$ac = !empty($ac) ? $ac : 'list';
+		$ac = $ac ?: 'list';
 		$this->params['ac'] = $ac;
 
 		switch ($ac) {
@@ -59,26 +59,34 @@ class c_stockout extends base_c {
 				$this->ShowMsg('删除错误：' . $idxObj->getError());
 			}
 			unset($this->params['ac']);
+        case 'query':
+            // first from url then post
+            $key['customer_name'] = $url['customer_name']
+                ?: base_Utils::getStr ( $_POST ['key_cname'] );
+            $key['stockout_sn'] = $url['stockout_sn']
+                ?: base_Utils::getStr ( $_POST ['key_ssn'] );
+            $key['goods_sn'] = $url['goods_sn']
+                ?: base_Utils::getStr ( $_POST ['key_gsn'] );
+            $key['goods_name'] = $url['goods_name']
+                ?: base_Utils::getStr ( $_POST ['key_name'] );
+            $key['date_start'] = $url['date_start']
+                ?: base_Utils::getStr($_POST['date_start']);
+            $key['date_end'] = $url['date_end']
+                ?: base_Utils::getStr($_POST['date_end']);
+            $key = array_filter($key);
+            // merge $key to $inPath
+            $inPath = $this->mergeParamsToInPath($inPath, array_merge($url, $key));
 
-		case'list':
+		case 'list':
 		default:
+            $subFilter = isset($_POST['filter']);
+            $subExport = isset($_POST['export']);
+            if($subFilter && $subExport){
+                $this->ShowMsg("呵呵");
+            }
+
 			$page = !empty($url ['page']) ? ( int ) $url ['page'] : 1;
 			$soutIdx = new m_stockoutindex ();
-			if ($_POST) {
-				$subFilter = isset($_POST['filter']);
-				$subExport = isset($_POST['export']);
-				if($subFilter && $subExport){
-					$this->ShowMsg("呵呵");
-				}
-
-				$key['customer_name'] = base_Utils::getStr ( $_POST ['key_cname'] );
-				$key['stockout_sn'] = base_Utils::getStr ( $_POST ['key_ssn'] );
-				$key['goods_sn'] = base_Utils::getStr ( $_POST ['key_gsn'] );
-				$key['goods_name'] = base_Utils::getStr ( $_POST ['key_name'] );
-				$key['date_start'] = base_Utils::getStr($_POST['date_start']);
-				$key['date_end'] = base_Utils::getStr($_POST['date_end']);
-			}
-
 			if($subExport) {
 				$soutDet = base_mAPI::get('m_stockoutdetail');
 				if(!$soutDet->exportByCondition($key)) {

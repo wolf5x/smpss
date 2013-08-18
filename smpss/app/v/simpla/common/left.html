@@ -11,7 +11,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "category"/}current{//if/}">分类管理</a>
         <ul>
             {/foreach from=$menu.category item=items key=k/}
-            <li><a href="{/get_url rule='/category/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/category/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -20,7 +20,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "goods"/}current{//if/}">商品管理</a>
         <ul>
             {/foreach from=$menu.goods item=items key=k/}
-            <li><a href="{/get_url rule='/goods/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/goods/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -29,7 +29,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "stockin"/}current{//if/}">进货管理</a>
         <ul>
             {/foreach from=$menu.stockin item=items key=k/}
-            <li><a href="{/get_url rule='/stockin/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/stockin/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -38,7 +38,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "stockout"/}current{//if/}">出货管理</a>
         <ul>
             {/foreach from=$menu.stockout item=items key=k/}
-            <li><a href="{/get_url rule='/stockout/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/stockout/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -47,7 +47,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "stockback"/}current{//if/}">退货管理</a>
         <ul>
             {/foreach from=$menu.stockback item=items key=k/}
-            <li><a href="{/get_url rule='/stockback/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/stockback/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -56,7 +56,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "statistics"/}current{//if/}">统计管理</a>
         <ul>
             {/foreach from=$menu.statistics item=items key=k/}
-            <li><a href="{/get_url rule='/statistics/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/statistics/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -65,7 +65,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "account"/}current{//if/}">帐号管理</a>
         <ul>
             {/foreach from=$menu.account item=items key=k/}
-            <li><a href="{/get_url rule='/account/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/account/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -74,7 +74,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "customer"/}current{//if/}">客户管理</a>
         <ul>
             {/foreach from=$menu.customer item=items key=k/}
-            <li><a href="{/get_url rule='/customer/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/customer/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -83,7 +83,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "member"/}current{//if/}">会员管理</a>
         <ul>
             {/foreach from=$menu.member item=items key=k/}
-            <li><a href="{/get_url rule='/member/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/member/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
@@ -92,7 +92,7 @@
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "system"/}current{//if/}">系统</a>
         <ul>
             {/foreach from=$menu.system item=items key=k/}
-            <li><a href="{/get_url rule='/system/'/}{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
+            <li><a href="{/get_url rule='/system/'/}/{/$k/}" class="{/if $inpath[2] eq $k/}current{//if/}">{/$items/}</a></li>
             {//foreach/}
         </ul>
       </li>
