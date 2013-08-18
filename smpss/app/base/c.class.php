@@ -5,7 +5,7 @@
  */
 class base_c extends SGui {
 	public $params = array ();
-	
+
 	public function __construct() {
 		//define(DEBUG, 1);
 		$this->params ['_time'] = time ();
@@ -13,7 +13,7 @@ class base_c extends SGui {
 		$this->params ['root_dir'] = base_Constant::ROOT_DIR ? '/' . trim ( base_Constant::ROOT_DIR, '/' ) : '' ;
 		self::getRights ();
 	}
-	
+
 	function isLogin() {
 		if ($_COOKIE ['key']) {
 			if ($_COOKIE ['key'] != md5 ( $_COOKIE ['admin_id'] . $_COOKIE ['admin_name'] . $_COOKIE ['lastlogintime'] . base_Constant::COOKIE_KEY )) {
@@ -30,7 +30,7 @@ class base_c extends SGui {
 		}
 		return true;
 	}
-	
+
 	function checkRights($inPath = array()) {
 		$gid = ( int ) $_COOKIE ['gid'];
 		$cacheName = "action_code_group_" . $gid;
@@ -53,7 +53,7 @@ class base_c extends SGui {
 		}
 		return false;
 	}
-	
+
 	private function getRights() {
 		$gid = ( int ) $_COOKIE ['gid'];
 		$cacheName = "action_code_group_" . $gid;
@@ -80,69 +80,76 @@ class base_c extends SGui {
 		for($i = 3; $i < count ( $inPath ); $i ++) {
 			//如果不遵守变量规则，直接跳过
 			//if (preg_match ( "/[^A-Za-z0-9_]/", $inPath [$i] ))
-				//continue;
+			//continue;
 			if ($i % 2) {
-                $key = urldecode($inPath[$i]);
-                $value = urldecode($inPath[$i+1]);
-                if ($key != '') {
-                    $newary [$key] = $value;
-                }
+				$key = urldecode($inPath[$i]);
+				$value = urldecode($inPath[$i+1]);
+				if ($key != '') {
+					$newary [$key] = $value;
+				}
 			}
 		}
 		unset ( $newary [base_Constant::URL_SUFFIX] );
 		return $newary;
 	}
 
-    /**
-     * 由参数dict还原inPath数组
-     */
-    public function mergeParamsToInPath($inPath, $params = array()) {
-        $newary = array_slice($inPath, 0, 3);
-        foreach($params as $key => $value) {
-            array_push($newary, $key, $value);
-        }
-        return $newary;
-    }
-	
+	/**
+	 * 由参数dict还原inPath数组
+	 */
+	public function mergeParamsToInPath($inPath, $params = array()) {
+		$newary = array_slice($inPath, 0, 3);
+		foreach($params as $key => $value) {
+			array_push($newary, $key, $value);
+		}
+		return $newary;
+	}
+
 	/**
 	 * 构建完整url
 	 */
 	public function createUrl($route, $params = array()) {
 		$root_dir = base_Constant::ROOT_DIR ? '/' . trim ( base_Constant::ROOT_DIR, '/' ) : '' ;
 		$uf = base_Constant::URL_FORMAT;
-        $url = rtrim ( $route, $uf );
-        $purl = self::createParamsUrl($params);
+		$url = rtrim ( $route, $uf );
+		$purl = self::createParamsUrl($params);
 		if ($purl != '') {
 			$sux = '.' . base_Constant::URL_SUFFIX;
-            $url = rtrim($url . $uf . $purl, $uf);
+			$url = rtrim($url . $uf . $purl, $uf);
 			//$url = rtrim ( $url . base_Constant::URL_FORMAT . $tmp, base_Constant::URL_FORMAT );
 		}
 		if (! base_Constant::REWRITE) {
 			return $root_dir."/index.php/c" . $url;
 		} else {
-            return $root_dir.$url;
-        }
+			return $root_dir.$url;
+		}
 	}
 
-    /** 
-     * 构建参数列表url
+	/** 
+	 * 构建参数列表url
+	 */
+	public function createParamsUrl($params = array()) {
+		$uf = base_Constant::URL_FORMAT;
+		$purl = '';
+		if (!empty($params)) {
+			foreach ($params as $key => $value) {
+				$key = urlencode($key);
+				$value = urlencode($value);
+				if ($key != '') {
+					$purl .= $key . $uf . $value . $uf;
+				}
+			}
+			$purl = rtrim($purl, $uf);
+		}
+		return $purl;
+	}
+
+    /**
+     * Redirect to url
      */
-    public function createParamsUrl($params = array()) {
-        $uf = base_Constant::URL_FORMAT;
-        $purl = '';
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
-                $key = urlencode($key);
-                $value = urlencode($value);
-                if ($key != '') {
-                    $purl .= $key . $uf . $value . $uf;
-                }
-            }
-            $purl = rtrim($purl, $uf);
-        }
-        return $purl;
+    public function redirectToUrl($url) {
+        header("Location: $url");
     }
-	
+
 	/**
 	 * 系统提示
 	 */

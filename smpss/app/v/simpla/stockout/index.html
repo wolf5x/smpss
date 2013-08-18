@@ -19,6 +19,7 @@
         <div class="form">
           <form action="{/get_url rule='/stockout/index' data='ac=query'/}" method="post" id="js-form">
             <fieldset class="clearfix">
+              <input type="hidden" name="lastfilter" value="{/$lastfilter/}" />
 				<p>
 					客户姓名：<span><input type="text" name="key_cname" value="{/$key.customer_name/}" class="text-input small-input" /></span>
 				</p>
@@ -63,7 +64,7 @@
 				<!--a href="{/get_url rule='/stockout/index' data='ac=detail&sid='|cat:$stockout[i].stockout_sn/}" title="详细"><img src="{/$root_dir/}/assets/simpla/images/icons/content.png" alt="详细" /></a-->
 				<a href="{/get_url rule='/stockout/stockout' data='ac=print&sid='|cat:$stockout[i].stockout_sn/}" title="打印" onclick="window.open($(this).attr('href'));return false"><img src="{/$root_dir/}/assets/simpla/images/icons/printer.png" alt="打印" /></a>
 				<!--a href="{/get_url rule='/stockout/stockout' data='ac=mod&sid='|cat:$stockout[i].stockout_sn/}" title="编辑"><img src="{/$root_dir/}/assets/simpla/images/icons/hammer_screwdriver.png" alt="编辑" /></a-->
-				<a onclick="return(confirm('确认要删除此出库单?'))" href="{/get_url rule='/stockout/index' data='ac=del&sid='|cat:$stockout[i].stockout_sn/}" title="删除"><img src="{/$root_dir/}/assets/simpla/images/icons/cross.png" alt="删除" /></a>
+				<a onclick="return(confirm('确认要删除此出库单?'))" href="{/get_url rule='/stockout/index' data='ac=del&sid='|cat:$stockout[i].stockout_sn|cat:'&lastfilter='|cat:$lastfilter/}" title="删除"><img src="{/$root_dir/}/assets/simpla/images/icons/cross.png" alt="删除" /></a>
 			</td>
           </tr>
           {/sectionelse/}
