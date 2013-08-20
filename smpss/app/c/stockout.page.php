@@ -133,6 +133,16 @@ class c_stockout extends base_c {
         $infos = &$_SESSION['infos']['stockout'];
 
         switch($ac) {
+            # FOR DEBUG
+        case 'sidlist':
+            $out_idx_obj =  base_mAPI::get("m_stockoutindex");
+            $dbresult = $out_idx_obj->getByCondition(array('isdel'=>0));
+            $sidlist = array();
+            foreach ($dbresult->items as $entry) {
+                $sidlist[] = $entry['stockout_sn'];
+            }
+            $this->ajaxReturn(0, '', $sidlist);
+
         case 'ajaxaddyes':
             $rsp = new stdclass();
             $data = &$_POST;

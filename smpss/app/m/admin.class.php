@@ -15,6 +15,7 @@ class m_admin extends base_m {
 	}
 	public function checkLogin($username, $pwd, $timeout = 7200) {
 		$pwd = md5 ( $pwd );
+        var_dump($pwd);
 		$rs = $this->selectOne ( "admin_name = '{$username}' and admin_pwd = '{$pwd}'" );
 		if ($rs) {
 			if ($this->update ( "admin_id = {$rs['admin_id']}", "lastlogintime = {$this->_time}" )) {

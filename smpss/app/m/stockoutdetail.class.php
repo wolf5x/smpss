@@ -64,7 +64,11 @@ class m_stockoutdetail extends base_m {
 		foreach($srs as $g) {
 			$grs = $goodsObj->getTheGoods($g['goods_sn'], $g['goods_name_chn'], $g['goods_name_tha']);
 			if(!$grs){
-				continue;
+                $this->setError(0, '出货单中商品不存在: ' . $g['goods_sn'] . ' : '
+                    . $g['goods_name_chn'] . ' : ' . $g['goods_name_tha']);
+                return false;
+                // debug
+				//continue;
 			}
 			if($upd){
 				$res = $goodsObj->setStock($grs['goods_id'], $g['goods_pack_num'], 1);
