@@ -26,6 +26,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `smpss_admin`
 --
 
+DROP TABLE IF EXISTS `smpss_admin`;
 CREATE TABLE IF NOT EXISTS `smpss_admin` (
   `admin_id` int(10) NOT NULL AUTO_INCREMENT,
   `admin_name` char(16) NOT NULL,
@@ -49,6 +50,7 @@ INSERT INTO `smpss_admin` (`admin_id`, `admin_name`, `admin_pwd`, `gid`, `create
 -- Table structure for table `smpss_category`
 --
 
+DROP TABLE IF EXISTS `smpss_category`;
 CREATE TABLE IF NOT EXISTS `smpss_category` (
   `cat_id` int(10) NOT NULL AUTO_INCREMENT,
   `cat_name` varchar(100) NOT NULL,
@@ -80,6 +82,7 @@ INSERT INTO `smpss_category` (`cat_id`, `cat_name`, `pid`, `is_show`, `sort`) VA
 -- Table structure for table `smpss_config`
 --
 
+DROP TABLE IF EXISTS `smpss_config`;
 CREATE TABLE IF NOT EXISTS `smpss_config` (
   `key` varchar(128) NOT NULL COMMENT '配置项名称',
   `value` varchar(1024) DEFAULT NULL COMMENT '配置项值',
@@ -108,6 +111,7 @@ INSERT INTO `smpss_config` (`key`, `value`) VALUES
 -- Table structure for table `smpss_customer`
 --
 
+DROP TABLE IF EXISTS `smpss_customer`;
 CREATE TABLE IF NOT EXISTS `smpss_customer` (
   `customer_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '客户id',
   `customer_name` varchar(100) NOT NULL COMMENT '客户名称',
@@ -121,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `smpss_customer` (
 -- Table structure for table `smpss_goods`
 --
 
+DROP TABLE IF EXISTS `smpss_goods`;
 CREATE TABLE IF NOT EXISTS `smpss_goods` (
   `goods_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品id',
   `goods_sn` varchar(32) NOT NULL COMMENT '商品编码',
@@ -150,6 +155,7 @@ INSERT INTO `smpss_goods` (`goods_id`, `goods_sn`, `goods_name_chn`, `goods_name
 -- Table structure for table `smpss_goods_history`
 --
 
+DROP TABLE IF EXISTS `smpss_goods_history`;
 CREATE TABLE IF NOT EXISTS `smpss_goods_history` (
   `goods_id` int(11) NOT NULL COMMENT '商品id',
   `goods_history_price` float NOT NULL DEFAULT '0' COMMENT '商品历史价格',
@@ -162,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `smpss_goods_history` (
 -- Table structure for table `smpss_group`
 --
 
+DROP TABLE IF EXISTS `smpss_group`;
 CREATE TABLE IF NOT EXISTS `smpss_group` (
   `gid` int(10) NOT NULL AUTO_INCREMENT,
   `group_name` varchar(60) NOT NULL,
@@ -185,6 +192,7 @@ INSERT INTO `smpss_group` (`gid`, `group_name`, `action_code`, `state`) VALUES
 -- Table structure for table `smpss_log`
 --
 
+DROP TABLE IF EXISTS `smpss_log`;
 CREATE TABLE IF NOT EXISTS `smpss_log` (
   `log_id` int(10) NOT NULL AUTO_INCREMENT,
   `type` tinyint(1) NOT NULL COMMENT '日志类型：0添加商品1商品入库2商品出库',
@@ -241,6 +249,7 @@ INSERT INTO `smpss_log` (`log_id`, `type`, `goods_id`, `content`, `user_id`, `us
 -- Table structure for table `smpss_mbgroup`
 --
 
+DROP TABLE IF EXISTS `smpss_mbgroup`;
 CREATE TABLE IF NOT EXISTS `smpss_mbgroup` (
   `mgid` int(10) NOT NULL AUTO_INCREMENT,
   `mgroup_name` varchar(32) NOT NULL,
@@ -263,6 +272,7 @@ INSERT INTO `smpss_mbgroup` (`mgid`, `mgroup_name`, `credit`, `discount`) VALUES
 -- Table structure for table `smpss_member`
 --
 
+DROP TABLE IF EXISTS `smpss_member`;
 CREATE TABLE IF NOT EXISTS `smpss_member` (
   `mid` int(10) NOT NULL AUTO_INCREMENT,
   `membercardid` varchar(16) NOT NULL COMMENT '会员卡ID',
@@ -302,6 +312,7 @@ INSERT INTO `smpss_member` (`mid`, `membercardid`, `realname`, `phone`, `mobile`
 -- Table structure for table `smpss_purchase`
 --
 
+DROP TABLE IF EXISTS `smpss_purchase`;
 CREATE TABLE IF NOT EXISTS `smpss_purchase` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `goods_id` int(10) NOT NULL,
@@ -344,6 +355,7 @@ INSERT INTO `smpss_purchase` (`id`, `goods_id`, `goods_sn`, `goods_name`, `cat_i
 -- Table structure for table `smpss_region`
 --
 
+DROP TABLE IF EXISTS `smpss_region`;
 CREATE TABLE IF NOT EXISTS `smpss_region` (
   `region_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -848,6 +860,7 @@ INSERT INTO `smpss_region` (`region_id`, `parent_id`, `region_name`, `region_ena
 -- Table structure for table `smpss_sales`
 --
 
+DROP TABLE IF EXISTS `smpss_sales`;
 CREATE TABLE IF NOT EXISTS `smpss_sales` (
   `sid` int(10) NOT NULL AUTO_INCREMENT,
   `goods_id` int(10) NOT NULL,
@@ -925,6 +938,7 @@ INSERT INTO `smpss_sales` (`sid`, `goods_id`, `goods_sn`, `goods_name`, `cat_id`
 -- Table structure for table `smpss_stockin`
 --
 
+DROP TABLE IF EXISTS `smpss_stockin`;
 CREATE TABLE IF NOT EXISTS `smpss_stockin` (
   `stockin_sn` varchar(32) NOT NULL COMMENT '入库单编号',
   `goods_sn` varchar(32) NOT NULL COMMENT '商品编码',
@@ -956,6 +970,7 @@ INSERT INTO `smpss_stockin` (`stockin_sn`, `goods_sn`, `goods_name_chn`, `goods_
 -- Table structure for table `smpss_stockout_detail`
 --
 
+DROP TABLE IF EXISTS `smpss_stockout_detail`;
 CREATE TABLE IF NOT EXISTS `smpss_stockout_detail` (
   `stockout_detail_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '出库明细id,仅作主键用',
   `stockout_sn` varchar(32) NOT NULL COMMENT '出库单编号',
@@ -1005,6 +1020,7 @@ INSERT INTO `smpss_stockout_detail` (`stockout_detail_id`, `stockout_sn`, `goods
 -- Table structure for table `smpss_stockout_index`
 --
 
+DROP TABLE IF EXISTS `smpss_stockout_index`;
 CREATE TABLE IF NOT EXISTS `smpss_stockout_index` (
   `stockout_sn` varchar(32) NOT NULL COMMENT '出库单编号',
   `customer_name` varchar(100) NOT NULL COMMENT '客户名称',
@@ -1033,6 +1049,7 @@ INSERT INTO `smpss_stockout_index` (`stockout_sn`, `customer_name`, `stockout_op
 
 -- stockback
 
+DROP TABLE IF EXISTS `smpss_stockback_index`;
 CREATE TABLE IF NOT EXISTS `smpss_stockback_index` (
   `stockback_sn` varchar(32) NOT NULL COMMENT '退货单编码',
   `customer_name` varchar(100) NOT NULL COMMENT '客户名称',
@@ -1046,6 +1063,7 @@ CREATE TABLE IF NOT EXISTS `smpss_stockback_index` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='退货索引';
 
 
+DROP TABLE IF EXISTS `smpss_stockback_detail`;
 CREATE TABLE IF NOT EXISTS `smpss_stockback_detail` (
   `stockback_detail_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '退货操作id',
   `stockback_sn` varchar(32) NOT NULL COMMENT '退货单编码',
@@ -1070,6 +1088,7 @@ CREATE TABLE IF NOT EXISTS `smpss_stockback_detail` (
 -- Table structure for table `smpss_system`
 --
 
+DROP TABLE IF EXISTS `smpss_system`;
 CREATE TABLE IF NOT EXISTS `smpss_system` (
   `sysname` varchar(100) NOT NULL,
   `options` text NOT NULL
@@ -1081,6 +1100,7 @@ CREATE TABLE IF NOT EXISTS `smpss_system` (
 -- Table structure for table `smpss_tempsales`
 --
 
+DROP TABLE IF EXISTS `smpss_tempsales`;
 CREATE TABLE IF NOT EXISTS `smpss_tempsales` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `order_id` varchar(14) NOT NULL,

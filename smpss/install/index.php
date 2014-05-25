@@ -94,7 +94,7 @@ if(!$_POST){
   <div id="main-content">
     <h2>欢迎  安装使用 ”<?php echo $title ?>“
     </h2>
-    <p id="page-intro">安装前,请检查<span class="red">app/cache,app/v_t,app/data,app/config</span> 有可写的权限。</p>
+    <p id="page-intro">安装前,请检查<span class="red">app/cache,app/v_t,app/data,config</span> 目录有可写的权限。</p>
     <pre>特别注意 如果你的安装目录不是网站的根目录
 请在 app/base/Constant.class.php中修改
 const ROOT_DIR = "";
