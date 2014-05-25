@@ -168,7 +168,7 @@ class c_system extends base_c {
 		$post = ( array ) base_Utils::shtmlspecialchars ( $post );
 		$action = $menu = array ();
 		foreach ( $post as $key => $val ) {
-			if (in_array ( $key, array ('system', 'account', 'member', 'category', 'goods', 'stockin', 'stockout', 'stockback','statistics','customer') )) {
+			if (in_array ( $key, array ('system', 'account', 'member', 'goods', 'stockin', 'stockout', 'stockback','statistics','customer') )) {
 				$_temp = array ();
 				foreach ( $val as $v ) {
 					$vArr = explode ( ':', $v );
