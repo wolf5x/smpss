@@ -7,7 +7,7 @@
       <br />
       <a href="{/get_url rule="/system/index"/}" title="管理首页">管理首页</a> | <a href="{/get_url rule="/main/logout"/}" title="退出系统">退出系统</a> </div>
     <ul id="main-nav">
-	{/if $menu.category/}
+<!--	{/if $menu.category/}
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "category"/}current{//if/}">分类管理</a>
         <ul>
             {/foreach from=$menu.category item=items key=k/}
@@ -15,7 +15,7 @@
             {//foreach/}
         </ul>
       </li>
-	{//if/}
+	{//if/}-->
 	{/if $menu.goods/}
       <li> <a href="javascript:;" class="nav-top-item {/if $inpath[1] eq "goods"/}current{//if/}">商品管理</a>
         <ul>
