@@ -65,7 +65,7 @@
 			datatype: "json",
 			colNames:['操作', '编号','商品名称(中/泰)','数量','库存','装箱数量','单价','总价','备注'],
 			colModel:[
-		{name:'op',index:'op',width:"30",sortable:false},
+                        {name:'op',index:'op',width:"30",sortable:false},
 			{name:'goods_sn',index:'goods_sn',width:"80"},
 			{name:'goods_name',index:'goods_name',width:"160"},
 			{name:'goods_pack_num',index:'goods_pack_num',width:"40",editable:true},
@@ -98,12 +98,12 @@
 				for(var i = 0; i < ids.length; i++) {
 					setListRowIcon($(this), ids[i]);
 				}
+				updateGridTotalPrice($(this));
 				ladd = "<a href='#' title='新增' onclick='addRow()'><span class='ui-button ui-icon ui-icon-plus'></span></a>";
 				lclr = "<a href='#' title='清空' onclick='clearList()'><span class='ui-button ui-icon ui-icon-trash'></span></a>";
 				//ladd = "<a href='#' title='新增' onclick='addRow()'>新增</a>";
 				//lclr = "<a href='#' title='清空' onclick='clearList()'>清空</a>";
 				opr = lclr + ladd;
-				updateGridTotalPrice($(this));
 				$(this).jqGrid('footerData', 'set', {op: opr});
 			},
 			beforeSelectRow: function(id) {
