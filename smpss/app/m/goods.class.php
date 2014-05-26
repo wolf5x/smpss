@@ -146,21 +146,20 @@ class m_goods extends base_m {
             $this->setError(0, "库存未找到");
             return false;
         }
-        if ($isadd == 1) {
-            $stock = $stock + $amount;
-        } else {
-            $stock = $stock - $amount;
+        if ($isadd == 0) {
+            $amount = -$amount;
         }
-        if ($stock < 0) {
+        if ($stock + $amount < 0) {
             $this->setError(0, "库存不能小于0");
             return false;
         }
-        $this->set("goods_stock", $stock);
-        if ($this->save()) {
-            return true;
+        
+        $res = $this->updateInc('', array('goods_stock' => $amount));
+        if (!$res) {
+             $this->setError(0, "保存数据失败" . $this->getError());
+            return false;
         }
-        $this->setError(0, "保存数据失败" . $this->getError());
-        return false;
+        return true;
     }
 
     /**

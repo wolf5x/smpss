@@ -90,7 +90,7 @@ class m_stockin extends base_m {
             $res = $this->save(false);
             if ($res) {
                 if ($upd) {
-                    $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num, 1); //更新库存
+                    $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num); //更新库存
                 }
                 if ($res) {
                     return true;
@@ -104,7 +104,7 @@ class m_stockin extends base_m {
             return false;
         } else {
             if ($upd) {
-                $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num - $snrs['goods_pack_num'], 1);
+                $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num - $snrs['goods_pack_num']);
                 if (!$res) {
                     $this->setError(0, "更新商品库存失败:" . $goodsObj->getError());
                     return false;
@@ -146,7 +146,7 @@ class m_stockin extends base_m {
                     return true;
                 }
                 // 修改库存
-                if ($goodsObj->setStock($goods['goods_id'], $rs['goods_pack_num'], 0)) {
+                if ($goodsObj->setStock($goods['goods_id'], -$rs['goods_pack_num'])) {
                     //$logObj = base_mAPI::get ( "m_log" );
                     //$logObj->create ( $rs ['goods_id'], "删除入库ID为 {$id} 的记录", 1 );
                     return true;

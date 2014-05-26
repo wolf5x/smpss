@@ -44,7 +44,7 @@ class m_stockbackdetail extends base_m {
         }
 
         $goodsObj = base_mAPI::get("m_goods");
-        $res = $goodsObj->setStock($data['goods_id'], $data['goods_pack_num'], 1);
+        $res = $goodsObj->setStock($data['goods_id'], $data['goods_pack_num']);
         if (!$res) {
             $this->set('isdel', 1);
             $this->save($lastInsertId);
@@ -71,7 +71,7 @@ class m_stockbackdetail extends base_m {
                 continue;
             }
             if ($upd) {
-                $res = $goodsObj->setStock($grs['goods_id'], $g['goods_pack_num'], 0);
+                $res = $goodsObj->setStock($grs['goods_id'], -$g['goods_pack_num']);
                 if (!$res) {
                     $this->setError(0, '恢复商品库存失败: ' . $goodsObj->getError());
                     return false;

@@ -70,7 +70,7 @@ class m_purchase extends base_m {
         $this->set("isdel", 1);
         if ($this->save($id)) {
             $goodsObj = base_mAPI::get("m_goods");
-            if ($goodsObj->setStock($rs ['goods_id'])) {
+            if ($goodsObj->setStock($rs ['goods_id'], -$rs['goods_id'])) {
                 $logObj = base_mAPI::get("m_log");
                 $logObj->create($rs ['goods_id'], "删除入库ID为 {$id} 的记录", 1);
                 return true;
@@ -209,7 +209,7 @@ class m_purchase extends base_m {
                 }
             }
             $goodsObj = base_mAPI::get("m_goods");
-            if ($goodsObj->setStock($goods_id, $amount, 0)) {
+            if ($goodsObj->setStock($goods_id, -$amount)) {
                 $logObj = base_mAPI::get("m_log");
                 $logObj->create($goods_id, "退款商品ID：{$goods_id}数量:{$num}退款总金额：{$amount}", 2);
                 return true;

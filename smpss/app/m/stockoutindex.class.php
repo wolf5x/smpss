@@ -87,25 +87,26 @@ class m_stockoutindex extends base_m {
         $this->set('goods_brief', $goods_brief);
         $this->set('stockout_totalprice', $stockout_totalprice);
         if ($is_create) {
+            // 保存出库单索引记录
+            $res = $this->save(false);
+            if (!$res) {
+                $this->setError(0, "保存出库单索引失败:" . $this->getError());
+                return false;
+            }
+            
             $detObj = base_mAPI::get("m_stockoutdetail");
             foreach ($detail as $g) {
                 $g['stockout_sn'] = $stockout_sn;
                 $g['stockout_opttime'] = $stockout_opttime;
                 $res = $detObj->create($g, true);
                 if (!$res) {
-                    //TODO 回滚(包括回滚库存)
+                    //回滚(包括回滚库存)
                     $detObj->delBySn($g['stockout_sn'], true);
                     $this->setError(0, '保存出库单明细失败：' . $detObj->getError());
                     return false;
                 }
             }
-            $res = $this->save(false);
-            if ($res) {
-                return $stockout_sn;
-            }
-            //TODO $detObj->deleteStockout($g['stockout_sn'], true);
-            $this->setError(0, "保存出库单索引失败:" . $this->getError());
-            return false;
+            
         } else {
             return false;
         }
