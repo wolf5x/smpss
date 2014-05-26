@@ -489,5 +489,23 @@ class Db_PDO extends DbObject{
 		}
 		return $condiStr;
 	}
+
+    public function getError() {
+        return $this->error;
+    }
+
+    /**
+     * TODO
+     * @param type $table
+     * @param type $condition
+     * @param type $item
+     * @return boolean
+     */
+    public function updateExp($table, $condition = "", $item = "") {
+        $this->error['code'] = 9999;
+        $this->error['msg'] = 'Method not supported.';
+        return false;
+    }
+
 }
 ?>

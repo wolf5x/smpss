@@ -113,10 +113,12 @@ class base_m {
         }
         $tableName = $this->tableName();
         if (!$tableName) {
+            $this->setError(9999, '内部错误：数据表名为空');
             return false;
         }
         $primarykey = $this->primarykey();
         if (!$primarykey) {
+            $this->setError(9999, '内部错误：主键名为空');
             return false;
         }
         if ($this->_pkid) { //存在主健值则为修改
@@ -127,6 +129,7 @@ class base_m {
                 $rowCount = $this->_db->update($tableName, $condition, $this->_dataTmp);
             }
             if ($rowCount === false) {
+                $this->setError(1000, '更新记录失败，记录不存在');
                 return false;
             } else {
                 $this->_dataTmp = array(); //清空临时数据
@@ -134,6 +137,9 @@ class base_m {
             }
         } else { //不存在主健值为插入
             $lastInsertID = $this->_db->insert($tableName, $this->_dataTmp);
+            if ($lastInsertID === false) {
+                $this->setError(1001, '插入记录失败');
+            }
             $this->_pkid = $lastInsertID;
             $this->_dataTmp = array(); //清空临时数据
             return $lastInsertID;
@@ -280,6 +286,20 @@ class base_m {
     public function update($condition = "", $item = "", $params = array('type' => 'main')) {
         return $this->_db->update($this->tableName(), $condition, $item, $params);
     }
+    
+    /**
+     * 更新记录，使用增量表达式修改字段
+     * @param type $condition
+     * @param array $item $k => $v 表示将字段$k的值增加$v
+     * @param type $params
+     * @return int,false 更新的记录条数，或者更新失败
+     */
+    public function updateInc($condition = "", $item = array(), $params = array('type' => 'main')) {
+        foreach ($item as $k => &$v) {
+            $v = "+($v)";
+        }
+        return $this->_db->updateExp($this->tableName(), $condition, $item, $params);
+    }
 
     /**
      * 删除记录
@@ -388,5 +408,5 @@ class base_m {
         }
         return true;
     }
-
+    
 }

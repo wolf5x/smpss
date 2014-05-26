@@ -287,6 +287,28 @@ class Db_Mysql extends DbObject {
         $this->execute($this->sql);
         return $this->rowCount();
     }
+    
+    /**
+     * update data with increment value
+     * 
+     * @param type $table
+     * @param type $condition
+     * @param type $item
+     * @return int,false
+     */
+    public function updateExp($table, $condition = "", $item = "") {
+        $value = $this->__quote($item, ",", true);
+        $condiStr = $this->__quote($condition);
+        if ($condiStr != "") {
+            $condiStr = " WHERE " . $condiStr;
+        }
+        $this->sql = "UPDATE $table SET $value $condiStr";
+        $res = $this->execute($this->sql);
+        if ($res === false) {
+            return false;
+        }
+        return $this->rowCount();
+    }
 
     /**
      * delete
@@ -421,26 +443,31 @@ class Db_Mysql extends DbObject {
             $this->__connect($forceReconnect = true);
         }
         if (defined("DEBUG")) {
-            echo "SQL:$sql\n";
+            SLog::write("SQL: $sql");
         }
         $result = mysql_query($sql, Db_Mysql::$globals[$this->key]);
         if (!$result) {
             $this->error['code'] = mysql_errno();
             $this->error['msg'] = mysql_error();
-
+            if (defined("DEBUG")) {
+                SLog::write("ERR: $this->getError()");
+            }
             return false;
         } else {
             return $result;
         }
     }
 
-    private function __quote($condition, $split = "AND") {
+    private function __quote($condition, $split = "AND", $isexp = false) {
         $condiStr = "";
         if (is_array($condition) || is_object($condition)) {
             $v1 = array();
             $i = 1;
             foreach ($condition as $k => $v) {
-                if (!is_numeric($k)) {
+                if ($isexp) {
+                    $k = $this->__addsqlslashes($k);
+                    $v1[] = "$k = ($k $v)";
+                } else if (!is_numeric($k)) {
                     if (strpos($k, ".") === false) {
                         $k = $this->__addsqlslashes($k);
                     }
@@ -465,6 +492,10 @@ class Db_Mysql extends DbObject {
         } else {
             return "`$k`";
         }
+    }
+
+    public function getError() {
+        return $this->error;
     }
 
     /*

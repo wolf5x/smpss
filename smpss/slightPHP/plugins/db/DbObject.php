@@ -28,9 +28,10 @@ abstract class DbObject{
 	abstract function select($table,$condition="",$item="*",$groupby="",$orderby="",$leftjoin="");
 	abstract function selectOne($table,$condition="",$item="*",$groupby="",$orderby="",$leftjoin="");
 	abstract function update($table,$condition="",$item="");
+        abstract function updateExp($table,$condition="",$item="");
 	abstract function delete($table,$condition="");
 	abstract function insert($table,$item="",$isreplace=false,$isdelayed=false,$update=array());
 	abstract function execute($sql);
-
+        abstract function getError();
 }
 ?>
