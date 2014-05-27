@@ -169,7 +169,8 @@
                         errmsg = rsp.errmsg;
                         if (errcode === 0) {
                             $().message("出库成功, 跳转到打印页面");
-                            var u = "{/get_url rule='/stockout/stockout' data='ac=print&sid=" + rsp.stockout_sn + "'/}";
+                            var u = "{/get_url rule='/stockout/stockout' data='ac=print&sid=__SID__'/}";
+                            u = u.replace('__SID__', rsp.stockout_sn);
                             newWindow(u);
                             $().message("出库成功!");
                             window.location.href = "{/get_url rule='/stockout/index'/}";

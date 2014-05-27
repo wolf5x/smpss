@@ -170,7 +170,8 @@
                         var errmsg = rsp.errmsg;
                         if (errcode === 0) {
                             $().message("退货成功, 跳转到打印页面");
-                            var u = "{/get_url rule='/stockback/stockback' data='ac=print&sid=" + rsp.stockback_sn + "'/}";
+                            var u = "{/get_url rule='/stockback/stockback' data='ac=print&sid=__SID__'/}";
+                            u = u.replace('__SID__', rsp.stockback_sn);
                             newWindow(u);
                             $().message("退货成功!");
                             window.location.href = "{/get_url rule='/stockback/index'/}";
