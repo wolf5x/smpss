@@ -2,3 +2,8 @@
 v_t/
 cache/
 
+/smpss/nbproject/private/
+/smpss/app/data/
+!/smpss/slightPHP/plugins/cache/
+/smpss/app/logs/
+/asset/

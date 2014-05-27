@@ -11,5 +11,5 @@
 ;default 是默认的数据库配置，如果没有找到你获取的zone，比如要在这个文件里找SDb::getConfig("friends")，
 ;由于friends没有配置，就读取default里的
 [default]
-main   =   "host:localhost,user:smpss,database:smpss,password:smpss123,charset:utf8"
-query  =   "host:localhost,user:smpss,database:smpss,password:smpss123,charset:utf8"
+main   =   "host:localhost,user:smpss,database:smpss,password:123!@#,charset:utf8"
+query  =   "host:localhost,user:smpss,database:smpss,password:123!@#,charset:utf8"
