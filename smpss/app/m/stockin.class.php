@@ -217,14 +217,14 @@ class m_stockin extends base_m {
         $sheet = $objPHPExcel->setActiveSheetIndex(0);
         // 标题名称, 数据表中列名, excel单元格格式描述
         $cols = array(
-            'stockin_sn' => array("入库单编号", 'stockin_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_sn' => array("商品编码", 'goods_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_name_chn' => array("商品名称(中)", 'goods_name_chn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_name_tha' => array("商品名称(泰)", 'goods_name_tha', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_pack_num' => array("数量(件)", 'goods_pack_num', PHPExcel_Style_NumberFormat::FORMAT_NUMBER),
-            'goods_pack_size' => array("装箱数量", 'goods_pack_size', PHPExcel_Style_NumberFormat::FORMAT_NUMBER),
-            'stockin_note' => array("备注", 'stockin_note', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'stockin_opttime' => array("日期", 'stockin_opttime', 'yyyy-mm-dd hh:mm:ss')
+            'stockin_sn' => array("入库单编号", 'stockin_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_sn' => array("商品编码", 'goods_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_name_chn' => array("商品名称(中)", 'goods_name_chn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_name_tha' => array("商品名称(泰)", 'goods_name_tha', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_pack_num' => array("数量(件)", 'goods_pack_num', PHPExcel_Style_NumberFormat::FORMAT_NUMBER, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'goods_pack_size' => array("装箱数量", 'goods_pack_size', PHPExcel_Style_NumberFormat::FORMAT_NUMBER, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'stockin_note' => array("备注", 'stockin_note', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'stockin_opttime' => array("日期", 'stockin_opttime', 'yyyy-mm-dd hh:mm:ss', PHPExcel_Cell_DataType::TYPE_NUMERIC)
         );
 
         $colCount = count($mat['key']);
@@ -238,8 +238,8 @@ class m_stockin extends base_m {
             $items[$i]['stockin_opttime'] = PHPExcel_Shared_Date::StringToExcel($items[$i]['stockin_opttime']);
             for ($j = 0; $j < $colCount; $j++) {
                 $cellName = sprintf("%s%d", PHPExcel_Cell::stringFromColumnIndex($j), $i + 2);
-                $sheet->setCellValue($cellName, $items[$i][$mat['key'][$j]]);
                 $sheet->getStyle($cellName)->getNumberFormat()->setFormatCode($cols[$mat['key'][$j]][2]);
+                $sheet->setCellValueExplicit($cellName, $items[$i][$mat['key'][$j]], $cols[$mat['key'][$j]][3]);
             }
         }
 

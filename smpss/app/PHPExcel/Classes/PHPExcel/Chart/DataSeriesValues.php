@@ -2,7 +2,7 @@
 /**
  * PHPExcel
  *
- * Copyright (c) 2006 - 2012 PHPExcel
+ * Copyright (c) 2006 - 2014 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,9 @@
  *
  * @category	PHPExcel
  * @package		PHPExcel_Chart
- * @copyright	Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright	Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version		##VERSION##, ##DATE##
+ * @version		1.8.0, 2014-03-02
  */
 
 
@@ -31,7 +31,7 @@
  *
  * @category	PHPExcel
  * @package		PHPExcel_Chart
- * @copyright	Copyright (c) 2006 - 2012 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright	Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
 class PHPExcel_Chart_DataSeriesValues
 {
@@ -262,7 +262,7 @@ class PHPExcel_Chart_DataSeriesValues
 	 *					FALSE - don't change the value of _dataSource
 	 * @return	PHPExcel_Chart_DataSeriesValues
 	 */
-	public function setDataValues($dataValues = array(), $refreshDataSource = true) {
+	public function setDataValues($dataValues = array(), $refreshDataSource = TRUE) {
 		$this->_dataValues = PHPExcel_Calculation_Functions::flattenArray($dataValues);
 		$this->_pointCount = count($dataValues);
 
@@ -277,9 +277,9 @@ class PHPExcel_Chart_DataSeriesValues
 		return $var !== NULL;
 	}
 
-	public function refresh(PHPExcel_Worksheet $worksheet) {
+	public function refresh(PHPExcel_Worksheet $worksheet, $flatten = TRUE) {
         if ($this->_dataSource !== NULL) {
-        	$calcEngine = PHPExcel_Calculation::getInstance();
+        	$calcEngine = PHPExcel_Calculation::getInstance($worksheet->getParent());
 			$newDataValues = PHPExcel_Calculation::_unwrapResult(
 			    $calcEngine->_calculateFormulaValue(
 			        '='.$this->_dataSource,
@@ -287,9 +287,41 @@ class PHPExcel_Chart_DataSeriesValues
 			        $worksheet->getCell('A1')
 			    )
 			);
+			if ($flatten) {
+				$this->_dataValues = PHPExcel_Calculation_Functions::flattenArray($newDataValues);
+				foreach($this->_dataValues as &$dataValue) {
+					if ((!empty($dataValue)) && ($dataValue[0] == '#')) {
+						$dataValue = 0.0;
+					}
+				}
+				unset($dataValue);
+			} else {
+				$cellRange = explode('!',$this->_dataSource);
+				if (count($cellRange) > 1) {
+					list(,$cellRange) = $cellRange;
+				}
 
-			$this->_dataValues = PHPExcel_Calculation_Functions::flattenArray($newDataValues);
+				$dimensions = PHPExcel_Cell::rangeDimension(str_replace('$','',$cellRange));
+				if (($dimensions[0] == 1) || ($dimensions[1] == 1)) {
+					$this->_dataValues = PHPExcel_Calculation_Functions::flattenArray($newDataValues);
+				} else {
+					$newArray = array_values(array_shift($newDataValues));
+					foreach($newArray as $i => $newDataSet) {
+						$newArray[$i] = array($newDataSet);
+					}
+
+					foreach($newDataValues as $newDataSet) {
+						$i = 0;
+						foreach($newDataSet as $newDataVal) {
+							array_unshift($newArray[$i++],$newDataVal);
+						}
+					}
+					$this->_dataValues = $newArray;
+				}
+			}
+			$this->_pointCount = count($this->_dataValues);
 		}
+
 	}
 
 }

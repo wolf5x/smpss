@@ -253,20 +253,20 @@ class m_stockoutdetail extends base_m {
 
         // Add some data
         $sheet = $objPHPExcel->setActiveSheetIndex(0);
-        // 标题名称, 数据表中列名, excel单元格格式描述
+        // 标题名称, 数据表中列名, excel单元格格式描述, 添加的前缀
         $cols = array(
-            'stockout_sn' => array("出库单编号", 'stockout_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'customer_name' => array("顾客名称", 'customer_name', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_sn' => array("商品编码", 'goods_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_name_chn' => array("商品名称(中)", 'goods_name_chn', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_name_tha' => array("商品名称(泰)", 'goods_name_tha', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'goods_pack_num' => array("出库数量(件)", 'goods_pack_num', PHPExcel_Style_NumberFormat::FORMAT_NUMBER),
-            'goods_pack_size' => array("装箱数量", 'goods_pack_size', PHPExcel_Style_NumberFormat::FORMAT_NUMBER),
-            'goods_unitprice' => array("单价", 'goods_unitprice', PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00),
-            'goods_totalprice' => array("总价", 'goods_totalprice', PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00),
-            'goods_note' => array("备注", 'goods_note', PHPExcel_Style_NumberFormat::FORMAT_TEXT),
-            'stockout_opttime' => array("出库日期", 'stockout_opttime', 'yyyy-mm-dd hh:mm:ss'),
-            'customer_name' => array("顾客名称", 'customer_name', PHPExcel_Style_NumberFormat::FORMAT_TEXT)
+            'stockout_sn' => array("出库单编号", 'stockout_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'customer_name' => array("顾客名称", 'customer_name', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_sn' => array("商品编码", 'goods_sn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_name_chn' => array("商品名称(中)", 'goods_name_chn', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_name_tha' => array("商品名称(泰)", 'goods_name_tha', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'goods_pack_num' => array("出库数量(件)", 'goods_pack_num', PHPExcel_Style_NumberFormat::FORMAT_NUMBER, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'goods_pack_size' => array("装箱数量", 'goods_pack_size', PHPExcel_Style_NumberFormat::FORMAT_NUMBER, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'goods_unitprice' => array("单价", 'goods_unitprice', PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'goods_totalprice' => array("总价", 'goods_totalprice', PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00, PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'goods_note' => array("备注", 'goods_note', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING),
+            'stockout_opttime' => array("出库日期", 'stockout_opttime', 'yyyy-mm-dd hh:mm:ss', PHPExcel_Cell_DataType::TYPE_NUMERIC),
+            'customer_name' => array("顾客名称", 'customer_name', PHPExcel_Style_NumberFormat::FORMAT_TEXT, PHPExcel_Cell_DataType::TYPE_STRING)
         );
 
         //var_dump($mat['key']);
@@ -290,8 +290,8 @@ class m_stockoutdetail extends base_m {
             $items[$i]['stockout_opttime'] = PHPExcel_Shared_Date::StringToExcel($items[$i]['stockout_opttime']);
             for ($j = 0; $j < $colCount; $j++) {
                 $cellName = sprintf("%s%d", PHPExcel_Cell::stringFromColumnIndex($j), $i + 2);
-                $sheet->setCellValue($cellName, $items[$i][$mat['key'][$j]]);
                 $sheet->getStyle($cellName)->getNumberFormat()->setFormatCode($cols[$mat['key'][$j]][2]);
+                $sheet->setCellValueExplicit($cellName, $items[$i][$mat['key'][$j]], $cols[$mat['key'][$j]][3]);
             }
         }
 
