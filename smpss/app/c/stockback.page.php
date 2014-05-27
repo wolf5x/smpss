@@ -201,25 +201,22 @@ class c_stockback extends base_c {
                     case 'list'://商品列表
                         $minLength = isset($_GET['minLength']) ? $_GET['minLength'] : 0;
                         $prefix = isset($_GET['prefix']) ? $_GET['prefix'] : '';
-                        $rsp = new stdclass();
                         $rows = null;
                         if (!($minLength < 0 || count($prefix) < $minLength)) {
                             $gObj = base_mAPI::get("m_goods");
                             $rows = $gObj->select("goods_sn like '{$prefix}%'", '', '', 'ORDER BY goods_sn ASC')->items;
                         }
-                        $rsp->rows = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $rsp = array('rows' => $rows ? $rows : array());
+                        $this->ajaxReturn(0, '', $rsp);
                     case 'ginfo'://一件商品详细信息
                         $goods_id = isset($_GET['goods_id']) ? $_GET['goods_id'] : '';
-                        $rsp = new stdclass();
                         if ($goods_id) {
                             $gObj = base_mAPI::get("m_goods", $goods_id);
                             $rows = $gObj->get();
                         } else {
-                            
                         }
                         $rsp = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $this->ajaxReturn(0, '', $rsp);
                     case 'cus'://客户列表
                         $minLength = isset($_GET['minLength']) ? $_GET['minLength'] : 0;
                         $prefix = isset($_GET['prefix']) ? $_GET['prefix'] : '';
@@ -228,9 +225,8 @@ class c_stockback extends base_c {
                             $cusObj = base_mAPI::get("m_customer");
                             $rows = $cusObj->select("customer_name like '{$prefix}%'", '', '', 'ORDER BY `customer_name` ASC')->items;
                         }
-                        $rsp = new stdclass();
-                        $rsp->rows = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $rsp = array('rows' => $rows ? $rows : array());
+                        $this->ajaxReturn(0, '', $rsp);
                     default:
                         break;
                 }
@@ -246,7 +242,6 @@ class c_stockback extends base_c {
                 $d = &$_POST;
                 $goods_id = isset($d['goods_id']) ? $d['goods_id'] : '';
                 $flag = false;
-                $rsp = new stdclass();
                 foreach ($infos['detail'] as &$g) {
                     if ($g['goods_id'] == $d['goods_id']) {
                         $gObj = base_mAPI::get('m_goods', $g['goods_id']);
@@ -259,29 +254,20 @@ class c_stockback extends base_c {
                         } else if ($d['goods_pack_num'] > $grs['goods_stock']) {
                             //$this->ajaxReturn(1, '商品数量不能超过库存！');
                         }
-
-
-                        /* 	if(empty($d['goods_unitprice'])) {
-                          //$this->ajaxReturn(1, '未设置商品单价！');
-                          } else if($d['goods_unitprice'] < 0) {
-                          $this->ajaxReturn(1, '商品单价不能小于0！');
-                          } */
                         $g['goods_pack_num'] = $d['goods_pack_num'];
                         //	$g['goods_unitprice'] = $d['goods_unitprice'];
                         $g['goods_totalprice'] = $d['goods_totalprice']; // * $g['goods_pack_size'] * $d['goods_pack_num'];
                         $g['goods_note'] = $d['goods_note'];
-
-//	$g['goods_unitprice'] = number_format($g['goods_unitprice'], 2, '.', '');
                         $g['goods_totalprice'] = number_format($g['goods_totalprice'], 2, '.', '');
-                        $rsp->goods_totalprice = $g['goods_totalprice'];
-                        $rsp->goods_stock = $grs['goods_stock'];
+                        $rsp = array( 'goods_totalprice' => $g['goods_totalprice'],
+                            'goods_stock' => $grs['goods_stock']);
                         break;
                     }
                 }
                 if (!$flag) {
                     $this->ajaxReturn(1, '商品不在退货列表中!');
                 }
-                $this->ajaxReturn('', '', $rsp);
+                $this->ajaxReturn(0, '', $rsp);
 
             case 'ajaxclr':
                 $infos['index'] = null;
@@ -291,17 +277,18 @@ class c_stockback extends base_c {
                 $result = &$infos['detail'];
                 $count = count($result);
                 $start = 0;
-                $rsp->records = $count;
+                $rsp = array();
+                $rsp['records'] = $count;
                 for ($i = 0; $i < $count; $i++) {
                     $row = &$result[$start + $i];
-                    $rsp->rows[$i]['id'] = $row['goods_id'];
+                    $rsp['rows'][$i]['id'] = $row['goods_id'];
                     $gObj = base_mAPI::get('m_goods', $row['goods_id']);
                     $grs = $gObj->getData('goods_stock');
                     if ($grs === false) {
                         $grs = '?';
                     }
                     $row['goods_stock'] = $grs;
-                    $rsp->rows[$i]['cell'] = array(
+                    $rsp['rows'][$i]['cell'] = array(
                         '',
                         $row['goods_sn'],
                         $row['goods_name_chn'] . '<br>' . $row['goods_name_tha'],
@@ -313,24 +300,21 @@ class c_stockback extends base_c {
                         $row['goods_note']
                     );
                 }
-                $this->ajaxReturn('', '', $rsp);
+                $this->ajaxReturn(0, '', $rsp);
             case 'ajaxout':
                 $infos['index']['customer_name'] = base_Utils::getStr($_POST['customer_name']);
                 $infos['index']['stockback_note'] = base_Utils::getStr($_POST['stockback_note']);
                 $idxObj = new m_stockbackindex();
                 $res = $idxObj->create($infos['index'], $infos['detail']);
                 if ($res) {
-                    $infos['index'] = array();
-                    $infos['detail'] = array();
+                    unset($infos['index']);
+                    unset($infos['detail']);
                     $stockback_sn = $res;
-
-                    $rsp = new stdclass();
-                    $rsp->stockback_sn = $stockback_sn;
-                    $this->ajaxReturn('', '', $rsp);
+                    $rsp = array('stockback_sn' => $stockback_sn);
+                    $this->ajaxReturn(0, '', $rsp);
                 } else {
                     //退货失败
-                    $this->ajaxReturn(9876, $idxObj->getError());
-                    //$this->ShowMsg("退货失败: " . $idxObj->getError());
+                    $this->ajaxReturn(1, $idxObj->getError());
                 }
             case 'print':
                 $idxObj = base_mAPI::get('m_stockbackindex', $stockback_sn);

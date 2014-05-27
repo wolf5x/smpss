@@ -24,7 +24,7 @@ class m_stockin extends base_m {
 
         if ($is_create) {
             if (!$data['goods_id']) {
-                $this->setError(0, '商品编号不能为空');
+                $this->setError(1, '商品编号不能为空');
                 return false;
             }
             $goodsObj = base_mAPI::get('m_goods', $data['goods_id']);
@@ -32,49 +32,33 @@ class m_stockin extends base_m {
         } else {
             $snrs = $this->get();
             if ($snrs['stockin_sn'] != $stockin_sn) {
-                $this->setError(0, "入库单编号非法");
+                $this->setError(1, "入库单编号非法");
                 return false;
             }
             $goodsObj = base_mAPI::get('m_goods');
             $rs = $goodsObj->getTheGoods($data['goods_sn'], $data['goods_name_chn'], $data['goods_name_tha']);
         }
         if ($upd && !$rs) {
-            $this->setError(0, '商品信息不存在');
+            $this->setError(1, '商品信息不存在');
             return false;
         }
 
         if ($rs['goods_sn'] != $data['goods_sn'] || $rs['goods_name_chn'] != $data['goods_name_chn'] || $rs['goods_name_tha'] != $data['goods_name_tha'] || $rs['goods_pack_size'] != $data['goods_pack_size']
         ) {
-            $this->setError(0, "商品数据异常!");
+            $this->setError(1, "商品数据异常!");
             return false;
         }
 
         $goods_pack_num = (int) $data['goods_pack_num'];
         if ($goods_pack_num <= 0) {
-            $this->setError(0, "入库数量必须大于0!");
+            $this->setError(1, "入库数量必须大于0!");
             return false;
         }
 
         $stockin_opttime = date('YmdHis');
-        $stockin_sn_flag = "0"; //必须和stockout,stockback的不同
 
         if ($is_create) {
-            //临时数据表
-            $ConstCountLength = 6;
-            $configObj = base_mAPI::get("m_config");
-            $last_stockin_sn = $configObj->getValue('last_stockin_sn');
-            $now_date = substr($stockin_opttime, 0, 8);
-            $last_date = substr($last_stockin_sn, 0, 8);
-            $last_cnt = substr($last_stockin_sn, 8, $ConstCountLength);
-            if (empty($last_stockin_sn) || $now_date != $last_date) {
-                $stockin_sn = $now_date . $stockin_sn_flag . str_pad('1', $ConstCountLength - 1, '0', STR_PAD_LEFT);
-            } else {
-                $stockin_sn = $last_date . str_pad($last_cnt + 1, $ConstCountLength, '0', STR_PAD_LEFT);
-            }
-            if (!$configObj->setValue('last_stockin_sn', $stockin_sn)) {
-                $this->setError(0, $configObj->getError());
-                return false;
-            }
+            $stockin_sn = $this->generateStockinSN();
         }
 
         //$content = $data ['content'] ? $data ['content'] : "增加入库：名称：{$rs ['goods_name']},数量：{$data ['in_num']}";
@@ -88,31 +72,31 @@ class m_stockin extends base_m {
         $this->set("stockin_opttime", $stockin_opttime);
         if ($is_create) {
             $res = $this->save(false);
-            if ($res) {
-                if ($upd) {
-                    $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num); //更新库存
-                }
-                if ($res) {
-                    return true;
-                }
-                $this->set('isdel', 1);
-                $this->save($stockin_sn);
-                $this->setError(0, "更新商品库存失败:" . $goodsObj->getError());
+            if (!$res) {
+                $this->setError(1, "写入入库单数据失败:" . $this->getError());
                 return false;
             }
-            $this->setError(0, "写入入库单数据失败:" . $this->getError());
-            return false;
+            if ($upd) {
+                $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num); //更新库存
+            }
+            if (!$res) {
+                $this->set('isdel', 1);
+                $this->save($stockin_sn);
+                $this->setError(1, "更新商品库存失败:" . $goodsObj->getError());
+                return false;
+            }
+            return true;
         } else {
             if ($upd) {
                 $res = $goodsObj->setStock($rs['goods_id'], $goods_pack_num - $snrs['goods_pack_num']);
                 if (!$res) {
-                    $this->setError(0, "更新商品库存失败:" . $goodsObj->getError());
+                    $this->setError(1, "更新商品库存失败:" . $goodsObj->getError());
                     return false;
                 }
             }
             $res = $this->save($stockin_sn);
             if (!$res) {
-                $this->setError(0, "写入入库单数据失败:" . $this->getError());
+                $this->setError(1, "写入入库单数据失败:" . $this->getError());
                 return false;
             }
             return true;
@@ -126,13 +110,13 @@ class m_stockin extends base_m {
      */
     public function deleteOne($id, $upd = true) {
         if (!$id) {
-            $this->setError(0, "入库单编号无效");
+            $this->setError(1, "入库单编号无效");
             return false;
         }
         $this->setPkid($id);
         $rs = $this->get();
         if (!$rs) {
-            $this->setError(0, "入库单不存在");
+            $this->setError(1, "入库单不存在");
             return false;
         }
         //删除当前行
@@ -153,12 +137,12 @@ class m_stockin extends base_m {
                 } else {
                     $this->set('isdel', 0);
                     $this->save();
-                    $this->setError(0, "更新商品库存失败:" . $goodsObj->getError());
+                    $this->setError(1, "更新商品库存失败:" . $goodsObj->getError());
                     return false;
                 }
             }
         } else {
-            $this->setError(0, "删除入库记录失败:" . $this->getError());
+            $this->setError(1, "删除入库记录失败:" . $this->getError());
             return false;
         }
     }
@@ -190,7 +174,7 @@ class m_stockin extends base_m {
         //	echo "fuck".$condition;
         $rs = $this->select($condition, '', '', 'order by stockin_opttime desc');
         if ($rs === false) {
-            $this->setError(0, '条件查询失败!');
+            $this->setError(1, '条件查询失败!');
             return false;
         }
         return $rs;
@@ -199,7 +183,7 @@ class m_stockin extends base_m {
     public function exportByCondition($conds) {
         $rs = $this->getByCondition($conds);
         if ($rs === false) {
-            $this->setError(0, '查询出错:' . $this->getError());
+            $this->setError(1, '查询出错:' . $this->getError());
             return false;
         }
         $items = $rs->items;
@@ -213,7 +197,7 @@ class m_stockin extends base_m {
         $ptn = '%(?P<key>\w+)(\|(?P<comment>[^\%]+))?%';
         $err = preg_match_all($ptn, $tpl, $mat);
         if (!$err) {
-            $this->setError(0, '导出模板不正确,请到系统配置中设置正确的模板!');
+            $this->setError(1, '导出模板不正确,请到系统配置中设置正确的模板!');
             return false;
         }
 
@@ -283,7 +267,7 @@ class m_stockin extends base_m {
         $ptn = '%(?P<key>\w+)%';
         $err = preg_match_all($ptn, $tpl, $mat);
         if (!$err) {
-            $this->setError(0, '导入模板不正确,请到系统配置中设置正确的模板!');
+            $this->setError(1, '导入模板不正确,请到系统配置中设置正确的模板!');
             return false;
         }
 
@@ -291,11 +275,11 @@ class m_stockin extends base_m {
         $type = $file['type'];
         $srcfile = $file['tmp_name'];
         if ($type != 'application/vnd.ms-excel') { //TODO add filetype support
-            $this->setError(0, '文件类型错误!');
+            $this->setError(1, '文件类型错误!');
             return false;
         }
         if (!file_exists($srcfile)) {
-            $this->setError(0, '文件上传失败, 请重试!');
+            $this->setError(1, '文件上传失败, 请重试!');
             return false;
         }
 
@@ -317,7 +301,7 @@ class m_stockin extends base_m {
         $colCount = count($mat['key']);
         for ($i = 0; $i < $colCount; $i++) {
             if (!isset($cols[$mat['key'][$i]])) {
-                $this->setError(0, '导入模板错误, 无法识别参数' . $mat['key'][$i]);
+                $this->setError(1, '导入模板错误, 无法识别参数' . $mat['key'][$i]);
                 return false;
             }
         }
@@ -334,4 +318,8 @@ class m_stockin extends base_m {
         return array();
     }
 
+    protected function generateStockinSN() {
+        $mt = split(' ', microtime());
+        return sprintf("%s%03d0%02d", date('YmdHis', $mt[1]), floor($mt[0]*1000), rand(10, 99));
+    }
 }

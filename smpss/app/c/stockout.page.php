@@ -228,25 +228,22 @@ class c_stockout extends base_c {
                     case 'list'://商品列表
                         $minLength = isset($_GET['minLength']) ? $_GET['minLength'] : 0;
                         $prefix = isset($_GET['prefix']) ? $_GET['prefix'] : '';
-                        $rsp = new stdclass();
                         $rows = null;
                         if (!($minLength < 0 || count($prefix) < $minLength)) {
                             $gObj = base_mAPI::get("m_goods");
                             $rows = $gObj->select("goods_sn like '{$prefix}%'", '', '', 'ORDER BY goods_sn ASC')->items;
                         }
-                        $rsp->rows = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $rsp = array('rows' => $rows ? $rows : array());
+                        $this->ajaxReturn(0, '', $rsp);
                     case 'ginfo'://一件商品详细信息
                         $goods_id = isset($_GET['goods_id']) ? $_GET['goods_id'] : '';
-                        $rsp = new stdclass();
                         if ($goods_id) {
                             $gObj = base_mAPI::get("m_goods", $goods_id);
                             $rows = $gObj->get();
                         } else {
-                            
                         }
                         $rsp = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $this->ajaxReturn(0, '', $rsp);
                     case 'cus'://客户列表
                         $minLength = isset($_GET['minLength']) ? $_GET['minLength'] : 0;
                         $prefix = isset($_GET['prefix']) ? $_GET['prefix'] : '';
@@ -255,9 +252,8 @@ class c_stockout extends base_c {
                             $cusObj = base_mAPI::get("m_customer");
                             $rows = $cusObj->select("customer_name like '{$prefix}%'", '', '', 'ORDER BY `customer_name` ASC')->items;
                         }
-                        $rsp = new stdclass();
-                        $rsp->rows = $rows ? $rows : array();
-                        $this->ajaxReturn('', '', $rsp);
+                        $rsp = array('rows' => $rows ? $rows : array());
+                        $this->ajaxReturn(0, '', $rsp);
                     default:
                         break;
                 }
@@ -273,7 +269,7 @@ class c_stockout extends base_c {
                 $d = &$_POST;
                 $goods_id = isset($d['goods_id']) ? $d['goods_id'] : '';
                 $flag = false;
-                $rsp = new stdclass();
+                $rsp = array();
                 foreach ($infos['detail'] as &$g) {
                     if ($g['goods_id'] == $d['goods_id']) {
                         $gObj = base_mAPI::get('m_goods', $g['goods_id']);
@@ -300,35 +296,36 @@ class c_stockout extends base_c {
 
                         $g['goods_unitprice'] = number_format($g['goods_unitprice'], 2, '.', '');
                         $g['goods_totalprice'] = number_format($g['goods_totalprice'], 2, '.', '');
-                        $rsp->goods_totalprice = $g['goods_totalprice'];
-                        $rsp->goods_stock = $grs['goods_stock'];
+                        $rsp['goods_totalprice'] = $g['goods_totalprice'];
+                        $rsp['goods_stock'] = $grs['goods_stock'];
                         break;
                     }
                 }
                 if (!$flag) {
                     $this->ajaxReturn(1, '商品不在出库列表中!');
                 }
-                $this->ajaxReturn('', '', $rsp);
+                $this->ajaxReturn(0, '', $rsp);
 
             case 'ajaxclr':
-                $infos['index'] = null;
-                $infos['detail'] = null;
+                unset($infos['index']);
+                unset($infos['detail']);
                 $this->ajaxReturn();
             case 'ajaxgetlist':
                 $result = &$infos['detail'];
                 $count = count($result);
                 $start = 0;
-                $rsp->records = $count;
+                $rsp = array();
+                $rsp['records'] = $count;
                 for ($i = 0; $i < $count; $i++) {
                     $row = &$result[$start + $i];
-                    $rsp->rows[$i]['id'] = $row['goods_id'];
+                    $rsp['rows'][$i]['id'] = $row['goods_id'];
                     $gObj = base_mAPI::get('m_goods', $row['goods_id']);
                     $grs = $gObj->getData('goods_stock');
                     if ($grs === false) {
                         $grs = '?';
                     }
                     $row['goods_stock'] = $grs;
-                    $rsp->rows[$i]['cell'] = array(
+                    $rsp['rows'][$i]['cell'] = array(
                         '',
                         $row['goods_sn'],
                         $row['goods_name_chn'] . '<br>' . $row['goods_name_tha'],
@@ -340,24 +337,22 @@ class c_stockout extends base_c {
                         $row['goods_note']
                     );
                 }
-                $this->ajaxReturn('', '', $rsp);
+                $this->ajaxReturn(0, '', $rsp);
             case 'ajaxout':
                 $infos['index']['customer_name'] = base_Utils::getStr($_POST['customer_name']);
                 $infos['index']['stockout_note'] = base_Utils::getStr($_POST['stockout_note']);
                 $idxObj = new m_stockoutindex();
                 $res = $idxObj->create($infos['index'], $infos['detail']);
                 if ($res) {
-                    $infos['index'] = array();
-                    $infos['detail'] = array();
+                    unset($infos['index']);
+                    unset($infos['detail']);
                     $stockout_sn = $res;
 
-                    $rsp = new stdclass();
-                    $rsp->stockout_sn = $stockout_sn;
-                    $this->ajaxReturn('', '', $rsp);
+                    $rsp = array('stockout_sn' => $stockout_sn);
+                    $this->ajaxReturn(0, '', $rsp);
                 } else {
                     //出库失败
-                    $this->ajaxReturn(9876, $idxObj->getError());
-                    //$this->ShowMsg("出库失败: " . $idxObj->getError());
+                    $this->ajaxReturn(1, $idxObj->getError());
                 }
             case 'print':
                 $idxObj = base_mAPI::get('m_stockoutindex', $stockout_sn);

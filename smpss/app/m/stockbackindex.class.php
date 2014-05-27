@@ -51,25 +51,9 @@ class m_stockbackindex extends base_m {
         }
 
         $stockback_opttime = date('YmdHis');
-        $stockback_sn_flag = "9";
 
         if ($is_create) {
-            //临时数据表
-            $ConstCountLength = 6;
-            $configObj = base_mAPI::get("m_config");
-            $last_stockback_sn = $configObj->getValue('last_stockback_sn');
-            $now_date = substr($stockback_opttime, 0, 8);
-            $last_date = substr($last_stockback_sn, 0, 8);
-            $last_cnt = substr($last_stockback_sn, 8, $ConstCountLength);
-            if (empty($last_stockback_sn) || $now_date != $last_date) {
-                $stockback_sn = $now_date . $stockback_sn_flag . str_pad('1', $ConstCountLength - 1, '0', STR_PAD_LEFT);
-            } else {
-                $stockback_sn = $last_date . str_pad($last_cnt + 1, $ConstCountLength, '0', STR_PAD_LEFT);
-            }
-            if (!$configObj->setValue('last_stockback_sn', $stockback_sn)) {
-                $this->setError(0, $configObj->getError());
-                return false;
-            }
+            $stockback_sn = $this->generateStockbackSN();
         }
 
         if (!isset($data['customer_name']) || empty($data['customer_name'])) {
@@ -88,28 +72,28 @@ class m_stockbackindex extends base_m {
         $this->set('stockback_totalprice', $stockback_totalprice);
 
         if ($is_create) {
+            $res = $this->save(false);
+            if (!$res) {
+                $this->setError(0, "保存退货单索引失败:" . $this->getError());
+                 return false;
+            }
+            
             $detObj = base_mAPI::get("m_stockbackdetail");
             foreach ($detail as $g) {
                 $g['stockback_sn'] = $stockback_sn;
                 $g['stockback_opttime'] = $stockback_opttime;
                 $res = $detObj->create($g, true);
                 if (!$res) {
-                    //TODO 回滚(包括回滚库存)
-                    $detObj->delBySn($g['stockback_sn'], true);
+                    $this->deleteOne($g['stockback_sn'], true);
                     $this->setError(0, '保存退货单明细失败：' . $detObj->getError());
                     return false;
                 }
             }
-            $res = $this->save(false);
-            if ($res) {
-                return $stockback_sn;
-            }
-            //TODO $detObj->deletestockback($g['stockback_sn'], true);
-            $this->setError(0, "保存退货单索引失败:" . $this->getError());
-            return false;
-        } else {
-            return false;
-        }
+            
+            return $stockback_sn;
+        } 
+        
+        return false;
     }
 
     /**
@@ -256,4 +240,8 @@ class m_stockbackindex extends base_m {
         return $idxRs;
     }
 
+    protected function generateStockbackSN() {
+        $mt = split(' ', microtime());
+        return sprintf("%s%03d9%02d", date('YmdHis', $mt[1]), floor($mt[0]*1000), rand(10, 99));
+    }
 }

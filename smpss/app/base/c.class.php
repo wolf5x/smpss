@@ -240,14 +240,12 @@ class base_c extends SGui {
         return $this->render("common/page/$style.html", $params);
     }
 
-    protected function ajaxReturn($errcode = 0, $errmsg = '', $rspObj = null) {
-        if (!$rspObj) {
-            $rspObj = new stdclass();
-        }
-        $rspObj->errcode = $errcode;
-        $rspObj->errmsg = $errmsg;
+    protected function ajaxReturn($errcode = 0, $errmsg = '', $rsp = array()) {
+        $rsp = (array)$rsp;
+        $rsp['errcode'] = $errcode;
+        $rsp['errmsg'] = $errmsg;
         header('Content-Type: application/json;charset=utf-8');
-        echo json_encode($rspObj);
+        echo json_encode($rsp);
         exit;
     }
 

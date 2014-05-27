@@ -101,6 +101,8 @@ class c_stockin extends base_c {
         $url = $this->getUrlParams($inPath);
         $goods_id = !empty($url ['gid']) ? $url ['gid'] : $_POST ['goods_id'];
         $stockin_sn = !empty($url ['sid']) ? $url['sid'] : $_POST['stockin_sn'];
+        $goods_sn = !empty($url ['gsn']) ? $url['gsn'] : $_POST['goods_sn'];
+        $goods_name_chn = !empty($_POST['goods_name_chn']) ? $_POST['goods_name_chn'] : '';
         $ac = !empty($url['ac']) ? $url['ac'] : (!empty($_POST['ac']) ? $_POST['ac'] : 'add');
         $this->params['ac'] = $ac;
         switch ($ac) {
@@ -112,29 +114,29 @@ class c_stockin extends base_c {
                         $this->ShowMsg("商品信息错误: " . $goodsObj->getError());
                     }
                     $this->params['goods'] = $goodsRs;
-                    $this->params['ac'] = 'addyes';
+                    $this->params['ac'] = 'ajaxaddyes';
                     break;
                 }
                 $this->params['ac'] = 'addch';
             case "addch":
                 if ($ac == "addch") {
                     $goodsObj = base_mAPI::get("m_goods");
-                    $goodsRs = $goodsObj->getTheGoods($_POST['goods_sn'], $_POST['goods_name_chn'], $_POST['goods_name_tha']);
+                    $goodsRs = $goodsObj->getTheGoods($goods_sn, $goods_name_chn, $_POST['goods_name_tha']);
                     if (!$goodsRs) {
                         $this->ShowMsg("商品信息错误: " . $goodsObj->getError());
                     }
                     $this->params['goods'] = $goodsRs;
-                    $this->params['ac'] = 'addyes';
+                    $this->params['ac'] = 'ajaxaddyes';
                 }
                 break;
-            case "addyes" :
+            case "ajaxaddyes" :
                 $stockinObj = base_mAPI::get("m_stockin");
                 $goodsObj = base_mAPI::get("m_goods", $goods_id);
                 $grs = $goodsObj->get();
                 if (!$grs) {
                     $this->ShowMsg("商品信息错误: " . $goodsObj->getError());
                 }
-                if ($ac == 'addyes') {
+                if ($ac == 'ajaxaddyes') {
                     unset($data['stockin_sn']);
                     $data ['goods_id'] = $goods_id;
                     $data ['goods_sn'] = $_POST ['goods_sn'];
@@ -143,13 +145,11 @@ class c_stockin extends base_c {
                     $data ['goods_pack_num'] = $_POST['goods_pack_num'];
                     $data ['goods_pack_size'] = $_POST ['goods_pack_size'];
                     $data ['stockin_note'] = $_POST['stockin_note'];
-                    //$data ['stockin_opttime'];
-                    //$data ['content'] = base_Utils::getStr ( $_POST ['content'] );
-                    $op = "入库";
                     if ($stockinObj->create($data)) {
-                        $this->ShowMsg($op . "成功！", $this->createUrl("/stockin/index"), 2, 1);
+                        $this->ajaxReturn();
+                    } else {
+                        $this->ajaxReturn(1, "入库出错！原因：" . $stockinObj->getError());
                     }
-                    $this->ShowMsg($op . "出错！原因：" . $stockinObj->getError());
                 }
                 $this->params ['goods'] = $grs;
                 break;
@@ -210,7 +210,6 @@ class c_stockin extends base_c {
             case 'mod':
             case 'modyes':
                 return $this->render('stockin/mod.html', $this->params);
-            case 'addyes':
             case 'del':
             default:
                 return $this->render('stockin/add.html', $this->params);

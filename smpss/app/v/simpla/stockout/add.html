@@ -8,7 +8,7 @@
         <div class="content-box-header">
             <h3>商品出库订单</h3>
             <ul class="content-box-tabs">
-                <li><a href="{/get_url rule="/stockout/index"/}">出库单管理</a></li>
+                <li><a href="{/get_url rule='/stockout/index'/}">出库单管理</a></li>
                 <li><a href="#tab1" class="default-tab">商品出库</a></li>
                 <!--	<li><a href="{/get_url rule="/stockout/stockout"/}">商品退货</a></li> -->
             </ul>
@@ -17,7 +17,7 @@
         <div class="content-box-content">
             <div class="tab-content default-tab" id="tab1">
                 <div class="form">
-                    <form action="{/get_url rule='/stockout/stockout' data='ac=out'/}" method="post" id="outidxform">
+                    <form id="outidxform">
                         <fieldset class="clearfix">
                             <table>
                                 <tr>
@@ -41,7 +41,7 @@
                                 <input type="button" class="button" id="clr_btn" value="清空" />
                                 <input type="button" class="button" id="add_btn" value="新增" />
                                 -->
-                                &nbsp;&nbsp;<input type="button" class="button" id="out_btn" value="确认出库" />
+                                <input type="button" class="button" id="out_btn" value="确认出库" />
                             </div>
                         </fieldset>
                     </form>
@@ -71,8 +71,7 @@
                 {name: 'goods_pack_num', index: 'goods_pack_num', width: "40", editable: true},
                 {name: 'goods_stock', index: 'goods_stock', width: "40"},
                 {name: 'goods_pack_size', index: 'goods_pack_size', width: "40"},
-                {name: 'goods_unitprice', index: 'goods_unitprice', width: "50", editable: true
-                },
+                {name: 'goods_unitprice', index: 'goods_unitprice', width: "50", editable: true},
                 {name: 'goods_totalprice', index: 'goods_totalprice', width: "60"},
                 {name: 'goods_note', index: 'goods_note', width: "80", editable: true}
             ],
@@ -93,17 +92,16 @@
             gridComplete: function() {
                 //$("#jqlist").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
                 //id, rows[#], total
-                var total = 0;
                 var ids = jQuery("#jqlist").jqGrid('getDataIDs');
                 for (var i = 0; i < ids.length; i++) {
                     setListRowIcon($(this), ids[i]);
                 }
-                updateGridTotalPrice($(this));
-                ladd = "<a href='#' title='新增' onclick='addRow()'><span class='ui-button ui-icon ui-icon-plus'></span></a>";
-                lclr = "<a href='#' title='清空' onclick='clearList()'><span class='ui-button ui-icon ui-icon-trash'></span></a>";
+                var ladd = "<a href='#' title='新增' onclick='addRow()'><span class='ui-button ui-icon ui-icon-plus'></span></a>";
+                var lclr = "<a href='#' title='清空' onclick='clearList()'><span class='ui-button ui-icon ui-icon-trash'></span></a>";
                 //ladd = "<a href='#' title='新增' onclick='addRow()'>新增</a>";
                 //lclr = "<a href='#' title='清空' onclick='clearList()'>清空</a>";
-                opr = lclr + ladd;
+                var opr = lclr + ladd;
+                updateGridTotalPrice($(this));
                 $(this).jqGrid('footerData', 'set', {op: opr});
             },
             beforeSelectRow: function(id) {
@@ -118,7 +116,6 @@
             }
 
         });
-
         cname = $("#customer_name").autocomplete({
             delay: 0,
             minLength: 0,
@@ -136,7 +133,7 @@
                                 label: item.customer_name,
                                 value: item.customer_name,
                                 id: item.customer_id
-                            }
+                            };
                         }));
                     }
                 });
@@ -152,7 +149,9 @@
             cname.autocomplete("search", "");
         });
         $("#out_btn").click(function() {
+            $self = $(this);
             if (confirm("确认出库?")) {
+                $self.attr('disabled', true);
                 $.ajax({
                     type: "post",
                     dataType: "json",
@@ -168,22 +167,20 @@
                         var errcode, errmsg;
                         errcode = rsp.errcode;
                         errmsg = rsp.errmsg;
-                        if (errcode == 0) {
+                        if (errcode === 0) {
                             $().message("出库成功, 跳转到打印页面");
-                            var u = "{/get_url rule='/stockout/stockout' data='ac=print&sid=${}'/}";
-                            u = u.replace("\${}", rsp.stockout_sn);
-                            //window.location.href = u;
+                            var u = "{/get_url rule='/stockout/stockout' data='ac=print&sid=" + rsp.stockout_sn + "'/}";
+                            newWindow(u);
                             $().message("出库成功!");
                             window.location.href = "{/get_url rule='/stockout/index'/}";
-                            newWindow(u);
                         } else {
+                            $self.removeAttr('disabled');
                             $().message("出库失败: " + errmsg);
                         }
-
                     }
-
                 });
-
+            } else {
+                return false;
             }
         });
         $("#add_btn").click(function() {
@@ -209,7 +206,7 @@
     }
     function clearList() {
         var sels = $("#jqlist").jqGrid('getGridParam', 'selarrrow');
-        if (false && sels == "") {
+        if (false && sels === "") {
             $().message("请选择要移除的商品！");
         } else {
             if (confirm("确定清空？")) {
@@ -227,7 +224,7 @@
                     success: function(result) {
                         var err = result.errcode;
                         var msg = result.errmsg;
-                        if (err == 0) {
+                        if (err === 0) {
                             /*	var arr = msg.split(',');
                              $.each(arr, function(i,n){
                              if(arr[i]!=""){
@@ -312,7 +309,7 @@
                                 label: item.goods_sn + ", " + item.goods_name_chn + ", " + item.goods_name_tha,
                                 value: item.goods_sn,
                                 id: item.goods_id
-                            }
+                            };
                         }));
                     }
                 });
@@ -340,7 +337,7 @@
     function g_successfunc(rsp) {
         var rspmsg = $.parseJSON(rsp.responseText);
         var errcode = rspmsg.errcode;
-        if (errcode == 0) {
+        if (errcode === 0) {
             return true;
         } else {
             return false;
@@ -392,9 +389,9 @@
                     $().message("请求失败: " + textStatus);
                 },
                 success: function(rsp) {
-                    errcode = rsp.errcode;
-                    errmsg = rsp.errmsg;
-                    if (errcode == 0) {
+                    var errcode = rsp.errcode;
+                    var errmsg = rsp.errmsg;
+                    if (errcode === 0) {
                         $("#jqlist").trigger("reloadGrid");
                         $().message("移除成功");
                     } else {
@@ -406,11 +403,6 @@
     }
 
     function newWindow(href) {
-        //var formObj = document.createElement('form');
-        //formObj.action = href;
-        //formObj.target = '_blank';
-        //document.documentElement.appendChild(formObj);
-        //formObj.submit();
         window.open(href);
         return false;
     }

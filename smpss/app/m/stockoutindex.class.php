@@ -19,20 +19,21 @@ class m_stockoutindex extends base_m {
     }
 
     /**
+     * @todo 暂不支持修改
      * @param $data 出库索引：customer_name,operator
      * @param $detail 出库明细数组：需手动添加stockout_sn
      */
     public function create($data, $detail) {
         $stockout_sn = $data['stockout_sn'];
         $is_create = empty($stockout_sn);
-        //TODO 暂不支持修改
         if (!$is_create) {
-            $this->setError(0, "暂不支持修改出库单");
+            $this->setError(1, "暂不支持修改出库单");
             return false;
         }
 
         $detail = $this->checkDetail($detail, $is_create);
         if (!$detail) {
+            $this->setError(1, "商品明细错误：" . $this->getError());
             return false;
         }
         $stockout_totalprice = 0;
@@ -51,25 +52,9 @@ class m_stockoutindex extends base_m {
         }
 
         $stockout_opttime = date('YmdHis');
-        $stockout_sn_flag = "5";
 
         if ($is_create) {
-            //临时数据表
-            $ConstCountLength = 6;
-            $configObj = base_mAPI::get("m_config");
-            $last_stockout_sn = $configObj->getValue('last_stockout_sn');
-            $now_date = substr($stockout_opttime, 0, 8);
-            $last_date = substr($last_stockout_sn, 0, 8);
-            $last_cnt = substr($last_stockout_sn, 8, $ConstCountLength);
-            if (empty($last_stockout_sn) || $now_date != $last_date) {
-                $stockout_sn = $now_date . $stockout_sn_flag . str_pad('1', $ConstCountLength - 1, '0', STR_PAD_LEFT);
-            } else {
-                $stockout_sn = $last_date . str_pad($last_cnt + 1, $ConstCountLength, '0', STR_PAD_LEFT);
-            }
-            if (!$configObj->setValue('last_stockout_sn', $stockout_sn)) {
-                $this->setError(0, $configObj->getError());
-                return false;
-            }
+            $stockout_sn = $this->generateStockoutSN();
         }
 
         if (!isset($data['customer_name']) || empty($data['customer_name'])) {
@@ -101,15 +86,13 @@ class m_stockoutindex extends base_m {
                 $res = $detObj->create($g, true);
                 if (!$res) {
                     //回滚(包括回滚库存)
-                    $detObj->delBySn($g['stockout_sn'], true);
+                    $this->deleteOne($g['stockout_sn'], true);
                     $this->setError(0, '保存出库单明细失败：' . $detObj->getError());
                     return false;
                 }
             }
-            
-        } else {
-            return false;
-        }
+        } 
+        return true;
     }
 
     /**
@@ -137,8 +120,13 @@ class m_stockoutindex extends base_m {
         return true;
     }
 
+    /**
+     * TODO 暂不支持修改
+     * @param type $det
+     * @param type $iscreate
+     * @return boolean
+     */
     public function checkDetail($det, $iscreate = true) {
-        //TODO 暂不支持修改
         $errmsg = '商品明细错误：';
         if (!$det || count($det) == 0) {
             $this->setError(0, $errmsg . '商品列表为空！');
@@ -146,12 +134,10 @@ class m_stockoutindex extends base_m {
         }
 
         $res = array();
-
         $goodsObj = base_mAPI::get("m_goods");
-
         foreach ($det as &$g) {
             $rs = $goodsObj->getTheGoods($g['goods_sn'], $g['goods_name_chn'], $g['goods_name_tha']);
-            if (!isset($rs['goods_id'])) {
+            if (!$rs) {
                 $this->setError(0, $errmsg . $goodsObj->getError());
                 return false;
             }
@@ -256,4 +242,8 @@ class m_stockoutindex extends base_m {
         return $idxRs;
     }
 
+    protected function generateStockoutSN() {
+                $mt = split(' ', microtime());
+        return sprintf("%s%03d5%02d", date('YmdHis', $mt[1]), floor($mt[0]*1000), rand(10, 99));
+    }
 }
